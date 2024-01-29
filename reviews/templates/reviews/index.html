@@ -1,0 +1,11 @@
+{% include 'base.html' %}
+
+{% block content %}
+<h1>WRCT Reviews</h1>
+
+<ul>
+{% for review in reviews %}
+<li>{{ review }}</li>
+{% endfor %}
+</ul>
+{% endblock %}
