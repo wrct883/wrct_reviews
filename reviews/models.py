@@ -5,9 +5,14 @@ from accounts.models import User
 class Artist(models.Model):
     artist = models.CharField(max_length=255, default='')
     short_name = models.CharField(max_length=6, null=True, blank=True)
+    comment = models.TextField(null = True, blank = True)
 
     def __str__(self):
         return self.artist
+
+    class Meta:
+        unique_together = ('artist', 'short_name',)
+
 
 
 class Label(models.Model):
@@ -18,6 +23,7 @@ class Label(models.Model):
     city = models.CharField(max_length=80, null=True, blank=True)
     state = models.CharField(max_length=2, null=True, blank=True)
     phone = models.CharField(max_length=80, null=True, blank=True)
+    comment = models.TextField(null = True, blank = True)
 
     def __str__(self):
         return self.label
@@ -34,8 +40,7 @@ class Album(models.Model):
     label = models.ForeignKey(Label, on_delete=models.SET_NULL, null=True, blank=True)
     genre = models.ManyToManyField(Genre, blank=True)
     year = models.PositiveSmallIntegerField(null=True, blank=True)
-    highest_chart_position = models.PositiveSmallIntegerField(null=True, blank=True)
-    date_added = models.DateTimeField(default=timezone.now)
+    date_added = models.DateTimeField(default=timezone.now, null=True)
 
     STATUS_CHOICES = [
         ("Bin", "Bin"),
