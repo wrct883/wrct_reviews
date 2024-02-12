@@ -1,0 +1,19 @@
+{% if page.paginator.num_pages > 1 %}
+<div class="pagination">
+    <span class="step-links">
+        {% if page.has_previous %}
+        <a href="#" onclick="setParam('{{ param }}', 1)">&laquo; first</a>
+        <a href="#" onclick="setParam('{{ param }}', {{ page.previous_page_number }})">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page.number }} of {{ page.paginator.num_pages }}.
+        </span>
+
+        {% if page.has_next %}
+        <a href="#" onclick="setParam('{{ param }}', {{ page.next_page_number }})">next</a>
+        <a href="#" onclick="setParam('{{ param }}', {{ page.paginator.num_pages }})">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+{% endif %}

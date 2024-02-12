@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}wrct database{% endblock %}
+
+{% block content %}
+<main class='big'>
+<h1 class='header-h1'>wrct : a database</h1>
+<header class='header'>
+  <aside>
+    <h2>Quick links</h2>
+    <ul>
+      <li><a href="https://cmu.box.com/s/z90uuq9clj19xsa43rq6p6wq62v3uffk">Digital Bin</a></li>
+      <li><a href="https://cmu.box.com/s/jlow52gircgh9l32noxgqhvkdqjk9stp">Digital TBR</a></li>
+      <li><a href="https://cmu.box.com/s/pt618hioiowze759rg74y2lyni11ib81">Digital Library</a></li>
+      <li><a href="#">Add new item to db</a></li>
+    </ul>
+  </aside>
+
+  <div>
+    <h2>Hello, <a href='#'>{{ user }}</a>!</h2>
+    <p class='subtitle'><b>DJ name:</b> {% if user.djname %}{{ user.djname }}{% endif %}</p>
+    <p class='subtitle'><b>Reviews this semester:</b> {{ user.reviews_this_semester }}</p>
+    <p><a href='{% url 'logout' %}'>log out</a></p>
+  </div>
+</header>
+
+<section>
+  <h1>Recent reviews</h1>
+  <a href="#">
+    <button class="outline mb1">
+      New Review <b class='icon'>+</b>
+    </button>
+  </a>
+  {% if reviews %}
+  {% include "library/includes/pagination.html" with page=reviews param='rpage' %}
+  <table class='list-table' id='rpage'>
+    <tr>
+      <th class='pointer' onclick="shuffleOrdering('date_added', 'ro', 'rpage')">
+        Date{% if ro == "-date_added" %}&#9660;{% elif ro == "date_added" %}&#9650;{% endif %}
+      </th>
+      <th class='pointer' onclick="shuffleOrdering('album', 'ro', 'rpage')">
+        Album{% if ro == "-album" %}&#9660;{% elif ro == "album" %}&#9650;{% endif %}
+      </th>
+      <th class='pointer' onclick="shuffleOrdering('user', 'ro', 'rpage')">
+        User{% if ro == "-user" %}&#9660;{% elif ro == "user" %}&#9650;{% endif %}
+      </th>
+      <th>Review</th>
+    </tr>
+    {% for review in reviews %}
+    <tr>
+      <td>{{ review.date_added|date:'Y-m-d' }}</td>
+      <td>{{ review.album|truncatechars:50 }} <a href="{% url 'library:detail' 'album' review.album.id %}">(view)</a></td>
+      <td>{{ review.user.name }}</td>
+      <td>{{ review.review|truncatechars:100 }} <a href="{% url 'library:detail' 'review' review.id %}">(view)</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% include "library/includes/pagination.html" with page=reviews param='rpage' %}
+  {% endif %}
+</section>
+
+<section>
+  <h1>Recent albums</h1>
+  <a href="#">
+    <button class="outline mb1">
+      New Album <b class='icon'>+</b>
+    </button>
+  </a>
+  {% if albums %}
+  {% include "library/includes/pagination.html" with page=albums param='apage' %}
+  <table class='list-table scrollable' id='rpage'>
+    <tr>
+      <th class='pointer' onclick="shuffleOrdering('album', 'ao', 'apage')">
+        Album{% if ao == "-album" %}&#9660;{% elif ao == "album" %}&#9650;{% endif %}
+      </th>
+      <th class='pointer' onclick="shuffleOrdering('label', 'ao', 'apage')">
+        Label{% if ao == "-label" %}&#9660;{% elif ao == "label" %}&#9650;{% endif %}
+      </th>
+      <th class='pointer' onclick="shuffleOrdering('artist', 'ao', 'apage')">
+        Arist{% if ao == "-artist" %}&#9660;{% elif ao == "artist" %}&#9650;{% endif %}
+      </th>
+      <th class='pointer' onclick="shuffleOrdering('format', 'ao', 'apage')">
+        Format{% if ao == "-format" %}&#9660;{% elif ao == "format" %}&#9650;{% endif %}
+      </th>
+      <th class='pointer' onclick="shuffleOrdering('year', 'ao', 'apage')">
+        Year{% if ao == "-year" %}&#9660;{% elif ao == "year" %}&#9650;{% endif %}
+      </th>
+      <th class='pointer' onclick="shuffleOrdering('date_added', 'ao', 'apage')">
+        Date Added{% if ao == "-date_added" %}&#9660;{% elif ao == "date_added" %}&#9650;{% endif %}
+      </th>
+      <th class='pointer' onclick="shuffleOrdering('status', 'ao', 'apage')">
+        Status{% if ao == "-status" %}&#9660;{% elif ao == "status" %}&#9650;{% endif %}
+      </th>
+    </tr>
+    {% for album in albums %}
+    <tr>
+      <td>{{ album.album|truncatechars:50 }} <a href="{% url 'library:detail' 'album' album.id %}">(view)</a></td>
+      <td>{{ album.label|truncatechars:50 }} <a href="{% url 'library:detail' 'label' album.label.id %}">(view)</a></td>
+      <td>{{ album.artist|truncatechars:50 }} <a href="{% url 'library:detail' 'artist' album.artist.id %}">(view)</a></td>
+      <td>{{ album.get_format_display }}</td>
+      <td>{{ album.year }}</td>
+      <td>{{ album.date_added|date:'Y-m-d' }}</td>
+      <td>{{ album.status }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% include "library/includes/pagination.html" with page=albums param='apage' %}
+  {% endif %}
+</section>
+
+</main>
+
+{% endblock %}

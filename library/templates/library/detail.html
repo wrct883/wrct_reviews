@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load library_filters %}
+{% block title %}wrct database : {{ object }}{% endblock %}
+
+{% block content %}
+<main>
+  <h1>{{ table }}: {{ object }}</h1>
+  <a href='{% url "library:index" %}'>&#8592; back to home</a>
+  {% for field in fields %}
+  <p class='subtitle'><b>{{ field }}:</b> {{ object|lookup:field }}</p>
+  {% endfor %}
+</main>
+{% endblock %}
+
+
