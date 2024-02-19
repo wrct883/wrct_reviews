@@ -3,6 +3,8 @@ from django.utils import timezone
 from datetime import date
 from accounts.models import User
 
+from django.urls import reverse
+
 class Artist(models.Model):
     artist = models.CharField(max_length=255, default='')
     short_name = models.CharField(max_length=6, null=True, blank=True)
@@ -11,6 +13,9 @@ class Artist(models.Model):
 
     def __str__(self):
         return self.artist
+
+    def get_absolute_url(self):
+        return reverse('library:detail', kwargs = {'table': 'artist', 'pk': self.pk})
 
 class Label(models.Model):
     label = models.CharField(max_length=255, default='')
@@ -26,12 +31,18 @@ class Label(models.Model):
     def __str__(self):
         return self.label
 
+    def get_absolute_url(self):
+        return reverse('library:detail', kwargs = {'table': 'label', 'pk': self.pk})
+
 class Genre(models.Model):
     genre = models.CharField(max_length=80, default='')
     olddb_id = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return self.genre
+
+    def get_absolute_url(self):
+        return reverse('library:detail', kwargs = {'table': 'genre', 'pk': self.pk})
 
 class Album(models.Model):
     album = models.CharField(max_length=255, default='')
@@ -76,6 +87,9 @@ class Album(models.Model):
     class Meta:
         ordering =  ('-date_added', 'album',)
 
+    def get_absolute_url(self):
+        return reverse('library:detail', kwargs = {'table': 'album', 'pk': self.pk})
+
 class Review(models.Model):
     user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
     date_added = models.DateTimeField(default=timezone.now)
@@ -88,4 +102,7 @@ class Review(models.Model):
 
     class Meta:
         ordering =  ('-date_added',)
+
+    def get_absolute_url(self):
+        return reverse('library:detail', kwargs = {'table': 'review', 'pk': self.pk})
 

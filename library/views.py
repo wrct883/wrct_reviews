@@ -51,7 +51,7 @@ def detail(request, table, pk):
     ModelClass = apps.get_model(app_label='library', model_name=table)
     if ModelClass is None:
         message.error("huh? this shouldn't have happened...")
-        return HttpResponseRedirect(reverse('llmreports:index'))
+        return HttpResponseRedirect(reverse('library:index'))
     obj = get_object_or_404(ModelClass, pk=pk)
     context = {
         'table': table,

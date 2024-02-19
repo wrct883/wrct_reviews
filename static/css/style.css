@@ -47,6 +47,38 @@ a:hover {
   text-decoration: underline;
 }
 
+nav {
+  border-bottom: 1px solid var(--gray);
+  align-items: center;
+  padding: 0.7em 2em;
+  background: white;
+}
+nav ul {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-flow: wrap;
+  align-items: center;
+}
+nav li {
+  list-style: none;
+  display: inline;
+  margin: 0 1em 0 0;
+}
+nav li:last-of-type {
+  margin-left: auto;
+}
+
+input, select, textarea {
+  padding: 5px 7.5px;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+}
+input:focus, select:focus {
+  border-color: var(--pink);
+}
+
+
 button, input[type=button], input[type=submit] {
   padding: 0.5em 1em;
   margin: 0;
@@ -135,7 +167,6 @@ table {
   margin-bottom: 1em;
 }
 td, th { padding: 0.5em; text-align: left; }
-.list-table { margin-top: 1.5em; }
 .list-table td, .list-table th { border: 1px solid #ddd; }
 .list-table td { font-family: monospace; font-size: 1rem;}
 .list-table tr:nth-child(even) {
@@ -151,5 +182,21 @@ td.pointer:hover { background-color: rgba(0,0,0,0.2) !important; }
   overflow-x: auto;
 }
 
-.mb1 { margin-bottom: 1em !important; }
-.mt1 { margin-bottom: 1em !important; }
+h1.large {
+  font-size: 2.25em;
+}
+
+.mt1-5 { margin-top: 1.5rem !important; }
+.mb1 { margin-bottom: 1rem !important; }
+.mt1 { margin-bottom: 1rem !important; }
+.vertical-align-top td { vertical-align: top !important; }
+
+@media (max-width: 965px) {
+  nav li:last-of-type {
+    margin-left: revert;
+    margin: 1em 0 0 0;
+  }
+  nav ul {
+    justify-content: center;
+  }
+}

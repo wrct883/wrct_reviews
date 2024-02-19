@@ -19,7 +19,7 @@
     <h2>Hello, <a href='#'>{{ user }}</a>!</h2>
     <p class='subtitle'><b>DJ name:</b> {% if user.djname %}{{ user.djname }}{% endif %}</p>
     <p class='subtitle'><b>Reviews this semester:</b> {{ user.reviews_this_semester }}</p>
-    <p><a href='{% url 'logout' %}'>log out</a></p>
+    <p><a href='#'>log out</a></p>
   </div>
 </header>
 
@@ -32,7 +32,8 @@
   </a>
   {% if reviews %}
   {% include "library/includes/pagination.html" with page=reviews param='rpage' %}
-  <table class='list-table' id='rpage'>
+  {# TODO: make this table an include #}
+  <table class='list-table mt1-5 scrollable' id='rpage'>
     <tr>
       <th class='pointer' onclick="shuffleOrdering('date_added', 'ro', 'rpage')">
         Date{% if ro == "-date_added" %}&#9660;{% elif ro == "date_added" %}&#9650;{% endif %}
@@ -67,7 +68,8 @@
   </a>
   {% if albums %}
   {% include "library/includes/pagination.html" with page=albums param='apage' %}
-  <table class='list-table scrollable' id='rpage'>
+  {# TODO: make this table an include #}
+  <table class='list-table mt1-5 scrollable' id='apage'>
     <tr>
       <th class='pointer' onclick="shuffleOrdering('album', 'ao', 'apage')">
         Album{% if ao == "-album" %}&#9660;{% elif ao == "album" %}&#9650;{% endif %}

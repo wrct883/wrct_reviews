@@ -40,3 +40,6 @@ class User(AbstractUser):
             else:
                 name = self.username
         return name.strip()
+
+    def __str__(self):
+        return self.name

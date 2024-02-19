@@ -20,6 +20,32 @@
   {% endif %}
 
   <nav>
+    <ul>
+      <li><a href="{% url 'library:index' %}">home</a></li>
+      <li><a href="#">new review</a></li>
+      <li><a href="#">explore bin</a></li>
+      <li><a href="#">log out</a></li>
+      <li>
+        Find
+        <select name="tbl">
+          <option value="Artist">Artists</option>
+          <option value="Album">Albums</option>
+          <option value="Label">Labels</option>
+          <option value="Review">Reviews</option>
+          <option value="User">Users</option>
+          <option value="Genre">Genres</option>
+        </select>
+        that
+        <select name="pos">
+          <option value="include">include</option>
+          <option value="begin">start with</option>
+          <option value="end">end with</option>
+          <option value="exact">match exactly</option>
+        </select>
+        <input type='input'></input>
+        <button class='small gray'>search</button>
+      </li>
+    </ul>
   </nav>
 
   {% block content %}
