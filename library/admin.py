@@ -9,6 +9,7 @@ admin.site.register(Genre)
 class AlbumAdmin(admin.ModelAdmin):
     list_display = ("album", "label", "artist", 'format', "year", "date_added", "date_removed", "status")
     raw_id_fields = ['label', 'artist']
+    search_fields = ['album']
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
