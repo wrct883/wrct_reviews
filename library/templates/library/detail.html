@@ -6,52 +6,48 @@
 <main>
   <h1 class='large'>{{ table }}: {{ object }}</h1>
   <a href='{% url "library:index" %}'>&#8592; back to home</a>
-  {% for field in fields %}
-  <p class='subtitle'><b>{{ object|verbose_name:field }}:</b> {{ object|lookup:field }}</p>
-  {% endfor %}
+  <div class="grid mt1-5">
+    {% for field in fields %}
+    <p class='subtitle'><b>{{ object|verbose_name:field }}: </b><span>{{ object|lookup:field }}</span></p>
+    {% endfor %}
+  </div>
+
+  <h2>Editing links</h2>
+  <ul>
+    <li><a href="{% url 'library:update' object.table object.pk %}">Edit this {{ table }}</a></li>
+    <li><a href="{% url 'library:delete' object.table object.pk %}">Delete this {{ table }}</a></li>
+    {% if table == "Album" %}
+    <li><a href="{% url 'library:create' object.table object.pk 'review' %}">Review this {{ table }}</a></li>
+    <li><a href="#">Add a subgenre classification for this {{ table }}</a></li>
+    {% endif %}
+  </ul>
 
   {% if table == "Album" %}
   <h1>Reviews</h1>
   {% if not object.review_set.all %}
   <p>There are no reviews for this album yet. Be the first to review it!</p>
   {% endif %}
-  <a href="#">
+  <a href="{% url 'library:create' object.table object.pk 'review' %}">
     <button class="outline mb1">
       Review this album <b class='icon'>+</b>
     </button>
   </a>
   {% if object.review_set.all %}
-  {# TODO: make this table an include #}
-  <table class='list-table vertical-align-top'>
-  <tr>
-    <th>user</th>
-    <th>review</th>
-  </tr>
-  {% for review in object.review_set.all %}
-  <tr>
-    <td>{{ review.user.name }}</td>
-    <td>{{ review.review }}</td>
-  </tr>
-  {% endfor %}
-  </table>
+  {% include "library/includes/table.html" with objects=object.review_set.all fields="user review" %}
   {% endif %}
   {% elif table == "Label" or table == "Artist" %}
   <h1>Related Albums</h1>
   {% if object.album_set.all %}
   {# TODO: make this table an include #}
-  <table class='list-table vertical-align-top'>
-  <tr>
-    <th>album</th>
-    <th>artist</th>
-  </tr>
-  {% for album in object.album_set.all %}
-  <tr>
-    <td>{{ album.album }}</td>
-    <td>{{ album.artist }}</td>
-  </tr>
-  {% endfor %}
-  </table>
+  {% include "library/includes/table.html" with objects=object.album_set.all fields="album year artist" %}
+  {% else %}
+  <p>This artist doesn't have any associated albums.</p>
   {% endif %}
+  <a href="{% url 'library:create' object.table object.pk 'album' %}">
+    <button class="outline mb1">
+      Add an album here <b class='icon'>+</b>
+    </button>
+  </a>
   {% endif %}
 </main>
 {% endblock %}

@@ -1,0 +1,27 @@
+{% load library_filters %}
+
+{% with fields=fields|parse_array %}
+<table class='list-table{% if class %} {{ class }}{% endif %}' id='{{ param }}'>
+  <tr>
+  {% for field in fields %}
+    <th>{{ objects.0|verbose_name:field }}</th>
+  {% endfor %}
+  </tr>
+  {% for object in objects %}
+  <tr>
+    {% for field in fields %}
+    <td>
+      {% if truncateRows %}{{ object|lookup:field|truncatechars_html:64 }}{% else %}{{ object|lookup:field }}{% endif %}
+      {% if field == 'review' %}
+      <a href="{% url 'library:detail' 'review' object.id %}">(view)</a>
+      {% endif %}
+    </td>
+    {% endfor %}
+  </tr>
+  {% endfor %}
+</table>
+
+{% if param %}
+{% include "library/includes/pagination.html" with page=objects param=param %}
+{% endif %}
+{% endwith %}

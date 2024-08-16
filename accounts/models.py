@@ -1,6 +1,8 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+from django.urls import reverse
+
 class User(AbstractUser):
     djname = models.CharField(max_length=40, null=True)
     phone = models.CharField(max_length=80, null=True, blank=True)
@@ -10,7 +12,6 @@ class User(AbstractUser):
         null = True,
         blank = True
     )
-
 
     AUTHLEVEL_CHOICES = [
         ("none", "None"),
@@ -27,6 +28,9 @@ class User(AbstractUser):
     def reviews_this_semester(self):
         return self.review_set.all().count()
 
+    def get_absolute_url(self):
+        return reverse('accounts:detail', kwargs = {'pk': self.pk})
+
     @property
     def name(self):
         name = ''
@@ -40,6 +44,10 @@ class User(AbstractUser):
             else:
                 name = self.username
         return name.strip()
+
+    @property
+    def table(self):
+        return "user"
 
     def __str__(self):
         return self.name

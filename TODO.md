@@ -1,19 +1,70 @@
-is there some way I can get recent actions? like the Django admin LogEntry, but then display messages like `<user> added <album> to the bin`, or, `<user> moved <album> from TBR to In Bin`?
 
 TODO:
 * need a way to dynamically create tables
-    * specify fields
+    * specify fields - DONE
     * specify which fields are sortable
     * specify the url parameter used for sorting that table
-    * use this in detail view (related albums, related reviews)
-    * use this in list views (browse/search)
-* remove + update views
+    * use this in detail view (related albums, related reviews) - DONE
+    * use this in list views (browse/search) - DONE
+* "explore bin" view
+    * and bring back "tools" a la olddb
 * profile page, and profile CRUD views
-* list views
-* search view
+* review leaderboard view
 * auth levels per users
 * authentication via oauth
+* bin actions: like the Django admin LogEntry, but then display messages like `<user> added <album> to the bin`, or, `<user> moved <album> from TBR to In Bin`?
+
 * fix the "reviews this semester" thing
+* need pagination on "related albums" tables
+
+* add subgenres which are many to many
+    * make genre back to a foreign key again methinks
+* add links to listen to an album on spotify/apple music?
+    * holy shit, can we integrate this with the spinitron api to get play data on albums/artists on our site??
+* add an api call to get album art?
+* add autocomplete on create search
+
+looks:
+* messages css
+* put the `edit links` as its own sidepanel
+* add the little icons from the old bin back to the edit links, I liked those
+* for `comment` and `review` labels, add my own css to those
+
+* set `date_removed` when updating an item from the bin, to not be in the bin
+
+spinitron integration??
+* creating a user automatically creates a spinitron user?
+* you can view artist spins on the artist detail page
+* you can view album spins on the album detail page
+    * also do album art
+
+## 2024-08-14
+* library tables: review, album, artist, label, genre
+* accounts: profile
+* title on detail views
+* idea: spotify links on the profile page
+
+DONE:
+* search view
+
+hours: call it at least 3
+
+## 2024-08-15
+* on the create page, you should see a searchable select field for everything *but* the related table field, if provided
+
+DONE:
+* progress on custom select field for searching
+* modified search view to produce json, and hooked up the search input field to hit that endpoint on keypress (debounced ofc)
+
+
+# 2024-08-16
+DONE:
+* think I largely finished the searching on create, maybe add autocomplete next
+* update view (mostly) done
+* delete view done
+
+---
+# todo i made for chris
 
 # Django Rest API
 need to set up api endpoints for:

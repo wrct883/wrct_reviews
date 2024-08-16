@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load library_filters %}
+{% block title %}wrct database : {{ table }}s{% endblock %}
+
+{% block content %}
+<main class='big'>
+  <h1 class='large'>{{ table }}s</h1>
+  <a href='{% url "library:index" %}'>&#8592; back to home</a>
+
+  <p><a href="{% url 'library:create' table|lower  %}">
+    <button class="outline mb1">
+      Create a new {{ table }} <b class='icon'>+</b>
+    </button>
+  </a></p>
+
+  {% if objects %}
+  {% include "library/includes/table.html" with objects=objects fields=fields param="page" truncateRows=True class="mt1-5 scrollable" %}
+  {% else %}
+  <p>no results :(</p>
+  {% endif %}
+</main>
+
+<script>
+  const url = new URL(window.location.href);
+  const params = new URLSearchParams(url.search);
+  const query = params.get('query');
+  const pos = params.get('pos');
+  const tableEl = document.querySelector('table');
+
+  // make text matching search query bold
+  if (query && tableEl && pos === 'icontains') {
+    const regex = new RegExp(query, 'gi');
+    tableEl.innerHTML = tableEl.innerHTML.replace(regex, (match) => `<b>${match}</b>`);
+  }
+</script>
+{% endblock %}
+
+

@@ -17,6 +17,15 @@ class Artist(models.Model):
     def get_absolute_url(self):
         return reverse('library:detail', kwargs = {'table': 'artist', 'pk': self.pk})
 
+    @property
+    def table(self):
+        return "artist"
+
+    @property
+    def json(self):
+        return {"name": str(self),
+                "id": self.id}
+
 class Label(models.Model):
     label = models.CharField(max_length=255, default='')
     contact_person = models.CharField(max_length=80, null=True, blank=True)
@@ -34,6 +43,15 @@ class Label(models.Model):
     def get_absolute_url(self):
         return reverse('library:detail', kwargs = {'table': 'label', 'pk': self.pk})
 
+    @property
+    def table(self):
+        return "label"
+
+    @property
+    def json(self):
+        return {"name": str(self),
+                "id": self.id}
+
 class Genre(models.Model):
     genre = models.CharField(max_length=80, default='')
     olddb_id = models.IntegerField(null=True, blank=True)
@@ -43,6 +61,15 @@ class Genre(models.Model):
 
     def get_absolute_url(self):
         return reverse('library:detail', kwargs = {'table': 'genre', 'pk': self.pk})
+
+    @property
+    def table(self):
+        return "genre"
+
+    @property
+    def json(self):
+        return {"name": str(self),
+                "id": self.id}
 
 class Album(models.Model):
     album = models.CharField(max_length=255, default='')
@@ -90,6 +117,18 @@ class Album(models.Model):
     def get_absolute_url(self):
         return reverse('library:detail', kwargs = {'table': 'album', 'pk': self.pk})
 
+    @property
+    def table(self):
+        return "album"
+
+    @property
+    def json(self):
+        return {"name": str(self),
+                "id": self.id,
+                "artist": str(self.artist if self.artist else ""),
+                "label": str(self.label if self.label else "")}
+
+
 class Review(models.Model):
     user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
     date_added = models.DateTimeField(default=timezone.now)
@@ -98,11 +137,20 @@ class Review(models.Model):
     olddb_id = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
-        return f"review by {self.user}"
+        return f"of {self.album} by {self.user}"
 
     class Meta:
         ordering =  ('-date_added',)
 
     def get_absolute_url(self):
         return reverse('library:detail', kwargs = {'table': 'review', 'pk': self.pk})
+
+    @property
+    def table(self):
+        return "review"
+
+    @property
+    def json(self):
+        return {"name": str(self),
+                "id": self.id}
 

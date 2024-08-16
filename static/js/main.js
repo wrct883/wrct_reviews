@@ -25,3 +25,16 @@ function shuffleOrdering(ordering_str, param='o', id=null) {
     newUrl += "#" + id;
   window.location.href = newUrl;
 }
+
+
+// remove a tags that point to the current page
+function removeSelfLinks() {
+  const links = document.querySelectorAll('a:not(nav a)');
+  links.forEach((link) => {
+    if (link.href === window.location.href) {
+      const textNode = document.createTextNode(link.textContent);
+      link.parentNode.replaceChild(textNode, link);
+    }
+  });
+}
+removeSelfLinks();

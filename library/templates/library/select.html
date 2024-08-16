@@ -1,0 +1,13 @@
+{% load library_filters %}
+{% with option=widget.optgroups.0.1.0 %}{% if option and not option.selected %}
+<span><em>{{ option.label }}</em></span>
+<input type="hidden" name="{{ widget.name }}" value="{{ option.value }}"></input>
+{% else %}
+<div class="search">
+  <div class="search-input">
+    <input type="text" name="{{ widget.name }}_search" value="{{ option.label }}" placeholder="search for {{ widget.name|anize }}"></input>
+  </div>
+  <div class="results"></div>
+  <input type="hidden" name="{{ widget.name }}" value="{{ option.value }}"></input>
+</div>
+{% endif %}{% endwith %}

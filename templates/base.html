@@ -22,28 +22,31 @@
   <nav>
     <ul>
       <li><a href="{% url 'library:index' %}">home</a></li>
-      <li><a href="#">new review</a></li>
+      <li><a href="{% url 'library:create' 'review' %}">new review</a></li>
       <li><a href="#">explore bin</a></li>
       <li><a href="#">log out</a></li>
       <li>
-        Find
-        <select name="tbl">
-          <option value="Artist">Artists</option>
-          <option value="Album">Albums</option>
-          <option value="Label">Labels</option>
-          <option value="Review">Reviews</option>
-          <option value="User">Users</option>
-          <option value="Genre">Genres</option>
-        </select>
-        that
-        <select name="pos">
-          <option value="include">include</option>
-          <option value="begin">start with</option>
-          <option value="end">end with</option>
-          <option value="exact">match exactly</option>
-        </select>
-        <input type='input'></input>
-        <button class='small gray'>search</button>
+        <form action="{% url 'library:search' %}" method="post">
+          {% csrf_token %}
+          Find
+          <select name="table" id="table">
+            <option value="artist">Artists</option>
+            <option value="album">Albums</option>
+            <option value="label">Labels</option>
+            <option value="review">Reviews</option>
+            <option value="user">Users</option>
+            <option value="genre">Genres</option>
+          </select>
+          that
+          <select name="pos" id="pos">
+            <option value="icontains">include</option>
+            <option value="istartswith">start with</option>
+            <option value="iendswith">end with</option>
+            <option value="iexact">match exactly</option>
+          </select>
+          <input type='input' name="query" id="query"></input>
+          <button class='small gray' type="submit">search</button>
+        </form>
       </li>
     </ul>
   </nav>
