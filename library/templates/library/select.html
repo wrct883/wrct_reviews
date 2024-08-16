@@ -1,6 +1,6 @@
 {% load library_filters %}
 {% with option=widget.optgroups.0.1.0 %}{% if option and not option.selected %}
-<span><em>{{ option.label }}</em></span>
+<span>{{ option.label }}</span>
 <input type="hidden" name="{{ widget.name }}" value="{{ option.value }}"></input>
 {% else %}
 <div class="search">

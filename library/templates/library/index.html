@@ -16,7 +16,7 @@
   </aside>
 
   <div>
-    <h2>Hello, <a href='{% url "accounts:profile" %}'>{{ user }}</a>!</h2>
+    <h2>Hello, <a href='{% url "library:profile" %}'>{{ user }}</a>!</h2>
     <p class='subtitle'><b>DJ name:</b> {% if user.djname %}{{ user.djname }}{% endif %}</p>
     <p class='subtitle'><b>Reviews this semester:</b> {{ user.reviews_this_semester }}</p>
     <p><a href='#'>log out</a></p>

@@ -36,8 +36,8 @@ def lookup(obj, field):
         string_rep = obj.get_format_display()
     elif field == 'status':
         string_rep = obj.get_status_display()
-    elif field == 'genre':
-        string_rep = ', '.join([str(genre) for genre in obj.genre.all()])
+    elif field == 'subgenre':
+        string_rep = ', '.join([str(sgenre) for sgenre in obj.subgenre.all()])
     elif isinstance(attr, date) or isinstance(attr, datetime):
         string_rep = attr.strftime("%Y-%m-%d")
     # TODO: make this list, and the one in converters.py, an application constant

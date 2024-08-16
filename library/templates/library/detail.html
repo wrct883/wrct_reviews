@@ -3,7 +3,7 @@
 {% block title %}wrct database : {{ object }}{% endblock %}
 
 {% block content %}
-<main>
+<main class='detail'>
   <h1 class='large'>{{ table }}: {{ object }}</h1>
   <a href='{% url "library:index" %}'>&#8592; back to home</a>
   <div class="grid mt1-5">
@@ -12,15 +12,17 @@
     {% endfor %}
   </div>
 
-  <h2>Editing links</h2>
-  <ul>
-    <li><a href="{% url 'library:update' object.table object.pk %}">Edit this {{ table }}</a></li>
-    <li><a href="{% url 'library:delete' object.table object.pk %}">Delete this {{ table }}</a></li>
-    {% if table == "Album" %}
-    <li><a href="{% url 'library:create' object.table object.pk 'review' %}">Review this {{ table }}</a></li>
-    <li><a href="#">Add a subgenre classification for this {{ table }}</a></li>
-    {% endif %}
-  </ul>
+  <aside class='side-panel'>
+    <h2>Editing links</h2>
+    <ul>
+      <li><a href="{% url 'library:update' object.table object.pk %}">Edit this {{ table }}</a></li>
+      <li><a href="{% url 'library:delete' object.table object.pk %}">Delete this {{ table }}</a></li>
+      {% if table == "Album" %}
+      <li><a href="{% url 'library:create' object.table object.pk 'review' %}">Review this {{ table }}</a></li>
+      <li><a href="#">Add a subgenre classification for this {{ table }}</a></li>
+      {% endif %}
+    </ul>
+  </aside>
 
   {% if table == "Album" %}
   <h1>Reviews</h1>

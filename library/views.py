@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.views import generic
-from .models import Album, Artist, Label, Genre, Review
+from .models import Album, Artist, Label, Genre, Review, Subgenre
 
 from datetime import datetime, timedelta
 from django.utils import timezone
@@ -18,7 +18,9 @@ from .forms import (
     ArtistForm,
     LabelForm,
     GenreForm,
-    ReviewForm
+    SubgenreForm,
+    ReviewForm,
+    UserForm,
 )
 
 def do_url_params(request, context, queryset, param):
@@ -52,12 +54,13 @@ def index(request):
     return render(request, "library/index.html", context)
 
 DETAIL_FIELDS = {
-        'Album': ('artist', 'album', 'label', 'genre', 'year', 'date_added', 'date_removed', 'status', 'format'),
+        'Album': ('artist', 'album', 'label', 'genre', 'subgenre', 'year', 'date_added', 'date_removed', 'status', 'format'),
         'Artist': ('artist', 'short_name', 'comment'),
         'Genre': ('genre'),
+        'Subgenre': ('genre', 'subgenre'),
         'Label': ('label', 'contact_person', 'email', 'address', 'city', 'state', 'phone', 'comment'),
         'Review': ('user', 'date_added', 'album', 'review'),
-        'User': ('first_name', 'last_name', 'djname', 'phone', 'email', 'auth_level'),
+        'User': ('username', 'first_name', 'last_name', 'djname', 'phone', 'email', 'auth_level'),
 }
 def detail(request, table, pk):
     ModelClass = apps.get_model(app_label='library', model_name=table)
@@ -70,12 +73,29 @@ def detail(request, table, pk):
     }
     return render(request, 'library/detail.html', context)
 
+@login_required
+def profile(request, pk=None):
+    if pk is None:
+        pk = request.user.id
+    return detail(request, 'User', pk)
+
 SEARCH_FIELDS = {
     'Album': ['album', 'artist'],
     'Artist': ['artist', 'short_name'],
     'Genre': ['genre'],
+    'Subgenre': ['genre', 'subgenre'],
     'Label': ['label', 'contact_person', 'email', 'address', 'city', 'state', 'phone', 'comment'],
     'Review': ['album', 'review'],
+    'User': ['first_name', 'last_name', 'username', 'djname'],
+}
+LIST_FIELDS = {
+        'Album': ('artist', 'album', 'label', 'genre', 'year', 'date_added', 'date_removed', 'status', 'format'),
+        'Artist': DETAIL_FIELDS['Artist'],
+        'Genre': DETAIL_FIELDS['Genre'],
+        'Subgenre': DETAIL_FIELDS['Subgenre'],
+        'Label': DETAIL_FIELDS['Label'],
+        'Review': DETAIL_FIELDS['Review'],
+        'User': DETAIL_FIELDS['User'],
 }
 def list(request, table = None):
     """
@@ -141,7 +161,7 @@ def list(request, table = None):
     context = {
         "table": table,
         "objects": objects_paged,
-        "fields": DETAIL_FIELDS[table],
+        "fields": LIST_FIELDS[table],
     }
     return render(request, 'library/list.html', context)
 
@@ -150,8 +170,10 @@ CREATE_FORMS = {
     'Album': AlbumForm,
     'Artist': ArtistForm,
     'Genre': GenreForm,
+    'Subgenre': SubgenreForm,
     'Label': LabelForm,
     'Review': ReviewForm,
+    'User': UserForm,
 }
 @login_required
 def create(request, table, related=None, related_pk=None, pk=None):

@@ -17,4 +17,7 @@ urlpatterns = [
     path("<table:related>/<int:related_pk>/create/<table:table>", views.create, name="create"),
     path("<table:table>/<int:pk>/delete", views.delete, name="delete"),
     path("<table:table>/<int:pk>/update", views.create, name="update"),
+
+    path("accounts/profile", views.profile, name="profile"),
+    path("accounts/profile/<int:pk>", views.profile, name="profile"),
 ]
