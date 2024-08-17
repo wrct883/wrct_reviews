@@ -1,13 +1,15 @@
 {% extends "base.html" %}
 {% load library_filters %}
-{% block title %}wrct database : add a new {{ table }}{% endblock %}
+{% block title %}wrct database : bin actions{% endblock %}
 
 {% block content %}
 <main>
   <h1 class='large'>Bin Action Log</h1>
   <a href='{% url "library:index" %}'>&#8592; back to home</a>
 
-   <ul class="mt1-5 action-list">
+  <section class="mt1-5">
+  {% include "library/includes/pagination.html" with page=page_obj param="page" %}
+  <ul class="action-list">
   {% for action in object_list %}
     <li>
       <code><em>{{action.action_time|date:"M d, Y, h:i a" }}: </em></code>
@@ -22,6 +24,7 @@
   {% endfor %}
   </ul>
   {% include "library/includes/pagination.html" with page=page_obj param="page" %}
+  </section>
 </main>
 
 {% endblock %}

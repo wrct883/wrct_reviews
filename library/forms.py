@@ -13,7 +13,7 @@ from .models import (
 
 
 # TODO: make this a constant with converters and views.py
-TABLE_CHOICES = [('album', 'Album'), ('artist', 'Artist'), ('genre', 'Genre'), ('label', 'Label'), ('review', 'Review'), ('user', 'User')]
+TABLE_CHOICES = [('album', 'Albums'), ('artist', 'Artists'), ('genre', 'Genres'), ('label', 'Labels'), ('review', 'Reviews'), ('user', 'Users')]
 POS_CHOICES = [('icontains', 'include'), ('istartswith', 'start with'), ('iendswith', 'end with'), ('iexact', 'match exactly')]
 class SearchForm(forms.Form):
     table = forms.ChoiceField(choices=TABLE_CHOICES)

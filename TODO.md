@@ -6,14 +6,9 @@ TODO:
     * specify the url parameter used for sorting that table
     * use this in detail view (related albums, related reviews) - DONE
     * use this in list views (browse/search) - DONE
-* "add another `table` like this function"
-* "explore bin" view
-    * and bring back "tools" a la olddb
-* review leaderboard view
 * auth levels per users
     * permission: only admin can make another user an admin, only exec can make another user exec, etc
 * authentication via oauth
-* bin actions: like the Django admin LogEntry, but then display messages like `<user> added <album> to the bin`, or, `<user> moved <album> from TBR to In Bin`?
 
 * fix the "reviews this semester" thing
 * need pagination on "related albums" tables
@@ -25,10 +20,10 @@ TODO:
 * add autocomplete on create search
 
 * bulk actions? just bulk delete, really
+* "add another `table` like this function" - editing link
 
 looks:
 * messages css
-* put the `edit links` as its own sidepanel
 * add the little icons from the old bin back to the edit links, I liked those
 * for `comment` and `review` labels, add my own css to those
 
@@ -68,6 +63,19 @@ DONE:
 * moved accounts to be under library
 * add subgenres which are many to many
     * make genre back to a foreign key again methinks
+
+# 2024-08-17
+DONE:
+* bin action log
+
+DONE:
+* explore bin view
+* review leaderboard view
+
+NEXT:
+* sortable tables
+* album art / spinitron on album page?
+* subgenre filtering (js?)
 
 ---
 # todo i made for chris

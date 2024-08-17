@@ -55,6 +55,7 @@ a:hover {
   color: var(--light-pink);
   text-decoration: underline;
 }
+a.active { font-weight: bold; }
 
 nav {
   border-bottom: 1px solid var(--gray);
@@ -147,13 +148,14 @@ button:disabled {
   display: grid;
   grid-template-columns: 250px 1fr;
   column-gap: 2em;
+  align-items: baseline;
 }
 .header aside, .side-panel {
   background-color: var(--light-gray);
   border-radius: 4px;
   padding: 0 1em 1em 1em;
 }
-.header div {
+.header > div {
   border: 1px solid var(--gray);
   border-radius: 4px;
   padding: 0 1em;
@@ -200,7 +202,9 @@ h1.large {
 
 .mt1-5 { margin-top: 1.5rem !important; }
 .mb1 { margin-bottom: 1rem !important; }
-.mt1 { margin-bottom: 1rem !important; }
+.mt1 { margin-top: 0.25rem !important; }
+.mt2 { margin-top: 0.5rem !important; }
+.mt3 { margin-top: 1rem !important; }
 .vertical-align-top td { vertical-align: top !important; }
 
 .form input:not([type="checkbox"]), .form select {
@@ -297,6 +301,44 @@ main.detail {
   font-family: mono, monospace;
   font-size: 0.9em;
   margin: 0 0.25rem;
+}
+
+.list-links {
+  margin-top: 1.5rem;
+}
+.list-links span:not(:last-of-type)::after {
+  content: "⦁︎";
+  color: #111;
+  margin: 0 0.25rem;
+}
+
+.leaderboard {
+  list-style: none;
+  padding-left: 1rem;
+}
+.leaderboard li {
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: baseline;
+  font-size: 1.2em;
+}
+.leaderboard li::after{
+  content: attr(data-count) " reviews";
+  margin-left: auto;
+}
+.leaderboard li::before{
+  content: attr(data-rank) ". ";
+  margin-right: 1rem;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+.leaderboard .leaderboard-count {display: none;}
+.leaderboard .leaderboard-user {}
+.leaderboard li:first-of-type {
+  background: var(--pink);
+  color: white;
+  box-shadow: rgba(149, 157, 165, 0.2) 4px 8px 8px;
+  font-size: 1.3em;
 }
 
 @media (max-width: 965px) {

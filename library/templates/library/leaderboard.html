@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load library_filters %}
+{% block title %}wrct database : reviews leaderboard{% endblock %}
+
+{% block content %}
+<main>
+  <h1 class='large'>Reviews Leaderboard</h1>
+  <a href='{% url "library:index" %}'>&#8592; back to home</a>
+
+  <p>Tracking the Reviews of our station members because please, people need to make more of these.</p>
+
+  <section class="mt1-5">
+    <h2>This Semester</h2>
+    {% if this_semester %}
+    <ol class='leaderboard'>
+    {% with this_semester|slice:":10" as this_semester %}{% for user, count in this_semester %}
+      <li data-count="{{ count }}" data-rank="{{ forloop.counter }}"><span class='leaderboard-user'>{{ user }}</span><span class='leaderboard-count'>: {{ count }}</span></li>
+      {% empty %}
+    {% endfor %}{% endwith %}
+    </ol>
+    {% else %}
+    <p>No one has made any reviews yet this semester</p>
+    {% endif %}
+  </section>
+
+  <section class="mt1-5">
+    <h2>All Time</h2>
+    <ol class='leaderboard'>
+    {% with users|slice:":10" as all_time %}{% for user in all_time %}
+    <li data-count="{{ user.review_count }}" data-rank="{{ forloop.counter }}"><span class='leaderboard-user'>{{ user }}</span><span class='leaderboard-count'> {{ user.review_count }}</span></li>
+    {% endfor %}{% endwith %}
+    </ol>
+  </section>
+</main>
+
+{% endblock %}
+
+

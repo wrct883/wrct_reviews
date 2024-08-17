@@ -1,9 +1,13 @@
 {% extends "base.html" %}
+{% load static %}
 {% load library_filters %}
 {% block title %}wrct database : {{ table }}s{% endblock %}
 
 {% block content %}
 <main class='big'>
+  <div class="list-links">
+    {% for ftable, label in form.table.field.choices %}<span><a href="{% url 'library:list' ftable %}"{% if ftable == table|lower %} class="active"{% endif %}>{{ label }}</a></span>{% endfor %}
+  </div>
   <h1 class='large'>{{ table }}s</h1>
   <a href='{% url "library:index" %}'>&#8592; back to home</a>
 
@@ -13,26 +17,20 @@
     </button>
   </a></p>
 
+  <form action="{% url 'library:search' %}" method="post">
+    {% csrf_token %}
+    Find {{ form.table }} that {{ form.pos }} {{ form.query }}
+    <button class='small gray' type="submit">search</button>
+  </form>
+
   {% if objects %}
   {% include "library/includes/table.html" with objects=objects fields=fields param="page" truncateRows=True class="mt1-5 scrollable" %}
   {% else %}
-  <p>no results :(</p>
+  <p><em>no results :(</em></p>
   {% endif %}
 </main>
-
-<script>
-  const url = new URL(window.location.href);
-  const params = new URLSearchParams(url.search);
-  const query = params.get('query');
-  const pos = params.get('pos');
-  const tableEl = document.querySelector('table');
-
-  // make text matching search query bold
-  if (query && tableEl && pos === 'icontains') {
-    const regex = new RegExp(query, 'gi');
-    tableEl.innerHTML = tableEl.innerHTML.replace(regex, (match) => `<b>${match}</b>`);
-  }
-</script>
 {% endblock %}
 
-
+{% block scripts %}
+<script type="text/javascript" src="{% static 'js/list.js' %}"></script>
+{% endblock %}

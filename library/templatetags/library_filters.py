@@ -44,7 +44,9 @@ def lookup(obj, field):
     if (field in ['review', 'album', 'artist', 'label', 'user']
         and type(attr) != str and attr is not None):
         string_rep = f'<a href="{attr.get_absolute_url()}">{string_rep}</a>'
-    elif (field.lower() != "review" and field.lower() == obj._meta.model_name and type(attr) == str and attr is not None):
+    elif ((field.lower() != "review" and field.lower() == obj._meta.model_name and
+           type(attr) == str and attr is not None)
+          or field == 'username'):
         string_rep = f'<a href="{obj.get_absolute_url()}">{string_rep}</a>'
 
     string_rep = string_rep if string_rep else ''

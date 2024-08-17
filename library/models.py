@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils import timezone
-from datetime import date
+from datetime import date, datetime
 from django.contrib.auth.models import AbstractUser
 from django.core.serializers.json import DjangoJSONEncoder
 
@@ -65,7 +65,15 @@ class User(AbstractUser):
 
     @property
     def reviews_this_semester(self):
-        return self.review_set.all().count()
+        now = datetime.now()
+        fall = datetime(year=now.year, month=8, day=26, hour=0, minute=0, second=0)
+        spring = datetime(year=now.year, month=1, day=10, hour=0, minute=0, second=0)
+
+        reviews = self.review_set.all()
+
+        if now > fall:
+            return reviews.filter(date_added__gt=fall).count()
+        return reviews.filter(date_added__gt=spring).count()
 
     def get_absolute_url(self):
         return reverse('library:profile', kwargs = {'pk': self.pk})

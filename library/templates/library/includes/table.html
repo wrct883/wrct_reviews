@@ -20,8 +20,5 @@
   </tr>
   {% endfor %}
 </table>
-
-{% if param %}
-{% include "library/includes/pagination.html" with page=objects param=param %}
-{% endif %}
+{% if param %}{% include "library/includes/pagination.html" with page=objects param=param %}{% endif %}
 {% endwith %}

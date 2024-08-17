@@ -3,7 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.views import generic
 from .models import (
-    Review, Album,
+    User, Review, Album,
     LibraryEntry,
     ADDITION, CHANGE, DELETION,
     DETAIL_FIELDS, SEARCH_FIELDS, LIST_FIELDS,
@@ -16,7 +16,7 @@ from django.contrib.auth.decorators import login_required
 
 from django.contrib import messages
 from django.apps import apps
-from django.db.models import Q
+from django.db.models import Q, Count
 from .forms import (
     SearchForm,
     AlbumForm,
@@ -37,7 +37,7 @@ def do_url_params(request, context, queryset, param):
     return queryset
 
 def index(request):
-    context = {}
+    context = {"indexView": True}
     review_period = datetime.now() - timedelta(days=30*3)
     reviews = Review.objects.filter(date_added__gt = review_period, date_added__lt=timezone.now())
     reviews = do_url_params(request, context, reviews, 'ro')
@@ -104,6 +104,7 @@ def list(request, table = None):
         return HttpResponseRedirect(reverse('library:index'))
 
     # we are on the list page formally now
+    form = SearchForm()
     ModelClass = apps.get_model(app_label='library', model_name=table)
     objects = ModelClass.objects.all()
 
@@ -140,6 +141,8 @@ def list(request, table = None):
         "table": table,
         "objects": objects_paged,
         "fields": LIST_FIELDS[table],
+        "form": form,
+        "listView": True,
     }
     return render(request, 'library/list.html', context)
 
@@ -253,4 +256,21 @@ class ActionListView(generic.list.ListView):
         context["ADDITION"] = ADDITION
         context["DELETION"] = DELETION
         context["CHANGE"] = CHANGE
+        context["actionView"] = True
         return context
+
+def leaderboard(request):
+    users = User.objects.all().annotate(review_count=Count("review")).order_by("-review_count")
+    thisSemester = []
+    for user in users:
+        count = user.reviews_this_semester
+        if count:
+            thisSemester.append((user, count))
+    thisSemester = sorted(thisSemester, key=lambda x: x[1], reverse=True)
+    context = {
+        "users": users,
+        "this_semester": thisSemester,
+        "leaderboardView": True,
+    }
+    return render(request, 'library/leaderboard.html', context)
+
