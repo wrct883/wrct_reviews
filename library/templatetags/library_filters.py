@@ -46,4 +46,6 @@ def lookup(obj, field):
         string_rep = f'<a href="{attr.get_absolute_url()}">{string_rep}</a>'
     elif (field.lower() != "review" and field.lower() == obj._meta.model_name and type(attr) == str and attr is not None):
         string_rep = f'<a href="{obj.get_absolute_url()}">{string_rep}</a>'
+
+    string_rep = string_rep if string_rep else ''
     return mark_safe(string_rep)

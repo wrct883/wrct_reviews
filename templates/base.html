@@ -23,7 +23,7 @@
     <ul>
       <li><a href="{% url 'library:index' %}">home</a></li>
       <li><a href="{% url 'library:create' 'review' %}">new review</a></li>
-      <li><a href="#">explore bin</a></li>
+      <li><a href="{% url 'library:actions' %}">action log</a></li>
       <li><a href="#">log out</a></li>
       <li>
         <form action="{% url 'library:search' %}" method="post">

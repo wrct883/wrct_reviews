@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load library_filters %}
+{% block title %}wrct database : add a new {{ table }}{% endblock %}
+
+{% block content %}
+<main>
+  <h1 class='large'>Bin Action Log</h1>
+  <a href='{% url "library:index" %}'>&#8592; back to home</a>
+
+   <ul class="mt1-5 action-list">
+  {% for action in object_list %}
+    <li>
+      <code><em>{{action.action_time|date:"M d, Y, h:i a" }}: </em></code>
+      {% if action.user %}<a href="{% url 'library:detail' 'user' action.user.id %}">{{ action.user }}</a>{% else %}a deleted user{% endif %}
+      {% if action.table == "Review" and action.action == ADDITION %}<code>reviewed</code> the album
+      {% else %}<code> {{ action.get_action_display }}</code> the {{ action.table|lower }}{% endif %}
+      {% if action.object %}<a href="{% url 'library:detail' action.table|lower action.object_id %}">{{ action.object_str }}</a>
+      {% else %}{{ action.object_str }}{% endif %}
+    </li>
+  {% empty %}
+      <li>No one has used the new db yet (or it's just broken, who knows).</li>
+  {% endfor %}
+  </ul>
+  {% include "library/includes/pagination.html" with page=page_obj param="page" %}
+</main>
+
+{% endblock %}
+
+

@@ -6,9 +6,9 @@ TODO:
     * specify the url parameter used for sorting that table
     * use this in detail view (related albums, related reviews) - DONE
     * use this in list views (browse/search) - DONE
+* "add another `table` like this function"
 * "explore bin" view
     * and bring back "tools" a la olddb
-* profile page, and profile CRUD views
 * review leaderboard view
 * auth levels per users
     * permission: only admin can make another user an admin, only exec can make another user exec, etc
@@ -23,6 +23,8 @@ TODO:
     * holy shit, can we integrate this with the spinitron api to get play data on albums/artists on our site??
 * add an api call to get album art?
 * add autocomplete on create search
+
+* bulk actions? just bulk delete, really
 
 looks:
 * messages css

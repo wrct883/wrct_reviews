@@ -37,6 +37,7 @@ body {
 main {
   max-width: var(--main-width);
   margin: 0 auto;
+  margin-top: 2rem;
   padding: 0 2em 2em 2em;
   box-sizing: content-box;
   /*border-left: 2px dotted var(--gray);
@@ -217,10 +218,10 @@ h1.large {
   grid-row-gap: 1rem;
 }
 .form .grid {align-items: end;}
-.grid > div, .grid > p {
+.grid > div:not(.error), .grid > p {
   display: contents;
 }
-.form .grid textarea, .form .grid fieldset { grid-column: 1 / 3; }
+.form .grid textarea, .form .grid fieldset, .form .grid .error { grid-column: 1 / 3; }
 .form .grid textarea {
   margin-top: -0.5rem;
   resize: vertical;
@@ -282,7 +283,6 @@ h1.large {
 main.detail {
   max-width: calc(var(--main-big-width) - var(--side-panel-width));
   position: relative;
-  margin-top: 2rem;
   /*transform: translateX(calc((var(--side-panel-width) + 2rem) / 2));*/
 }
 .side-panel {
@@ -291,6 +291,12 @@ main.detail {
   top: 0;
   transform: translateX(calc(-100% - 2rem));
   width: var(--side-panel-width);
+}
+
+.action-list code {
+  font-family: mono, monospace;
+  font-size: 0.9em;
+  margin: 0 0.25rem;
 }
 
 @media (max-width: 965px) {

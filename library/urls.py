@@ -20,4 +20,6 @@ urlpatterns = [
 
     path("accounts/profile", views.profile, name="profile"),
     path("accounts/profile/<int:pk>", views.profile, name="profile"),
+
+    path("actions", views.ActionListView.as_view(), name="actions"),
 ]

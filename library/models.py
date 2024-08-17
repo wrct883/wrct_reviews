@@ -2,8 +2,44 @@ from django.db import models
 from django.utils import timezone
 from datetime import date
 from django.contrib.auth.models import AbstractUser
+from django.core.serializers.json import DjangoJSONEncoder
 
 from django.urls import reverse
+
+from django.apps import apps
+from django.db.models.signals import post_save, post_delete, pre_save
+from django.dispatch import receiver
+import copy
+
+
+DETAIL_FIELDS = {
+    'Album': ('artist', 'album', 'label', 'genre', 'subgenre', 'year', 'date_added', 'date_removed', 'status', 'format'),
+    'Artist': ('artist', 'short_name', 'comment'),
+    'Genre': ('genre'),
+    'Subgenre': ('genre', 'subgenre'),
+    'Label': ('label', 'contact_person', 'email', 'address', 'city', 'state', 'phone', 'comment'),
+    'Review': ('user', 'date_added', 'album', 'review'),
+    'User': ('username', 'first_name', 'last_name', 'djname', 'phone', 'email', 'auth_level'),
+}
+SEARCH_FIELDS = {
+    'Album': ['album', 'artist'],
+    'Artist': ['artist', 'short_name'],
+    'Genre': ['genre'],
+    'Subgenre': ['genre', 'subgenre'],
+    'Label': ['label', 'contact_person', 'email', 'address', 'city', 'state', 'phone', 'comment'],
+    'Review': ['album', 'review'],
+    'User': ['first_name', 'last_name', 'username', 'djname'],
+}
+LIST_FIELDS = {
+    'Album': ('artist', 'album', 'label', 'genre', 'year', 'date_added', 'date_removed', 'status', 'format'),
+    'Artist': DETAIL_FIELDS['Artist'],
+    'Genre': DETAIL_FIELDS['Genre'],
+    'Subgenre': DETAIL_FIELDS['Subgenre'],
+    'Label': DETAIL_FIELDS['Label'],
+    'Review': DETAIL_FIELDS['Review'],
+    'User': DETAIL_FIELDS['User'],
+}
+
 
 class User(AbstractUser):
     djname = models.CharField(max_length=40, null=True, blank=True)
@@ -231,3 +267,147 @@ class Review(models.Model):
         return {"name": str(self),
                 "id": self.id}
 
+
+ADDITION = 1
+CHANGE = 2
+DELETION = 3
+ACTION_CHOICES = [
+    (ADDITION, "created"),
+    (CHANGE, "updated"),
+    (DELETION, "deleted"),
+]
+class LibraryEntry(models.Model):
+    """
+    Library Entries track all of the actions made on the site by users
+    """
+    action = models.IntegerField(choices=ACTION_CHOICES, default=1)
+    action_time = models.DateTimeField(default=timezone.now)
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
+
+    object_id = models.IntegerField(null=True, blank=True)
+    object_str = models.CharField(max_length=255, null=True, blank=True)
+
+    TABLE_CHOICES = [
+        ("Album", "Album"),
+        ("Artist", "Artist"),
+        ("Label", "Label"),
+        ("Review", "Review"),
+        ("Genre", "Genre"),
+        ("Subgenre", "Subgenre"),
+        ("User", "User"),
+    ]
+    table = models.CharField(max_length=16, null=True, blank=True, choices=TABLE_CHOICES)
+
+    changed_fields = models.JSONField(encoder=DjangoJSONEncoder, null=True, blank=True)
+
+    @property
+    def object(self):
+        ModelClass = apps.get_model(app_label='library', model_name=self.table)
+        if self.action == DELETION:
+            return None
+        try:
+            return ModelClass.objects.get(pk=self.object_id)
+        except Exception as e:
+            print(e)
+            return None
+
+    def __str__(self):
+        user = str(self.user) if self.user else "deleted user"
+        if self.table == "Review" and self.action == ADDITION:
+            return f"{user} reviewed the album {self.object_str}"
+        # TODO: do something with changed_fields here
+        s = f'{user} {self.get_action_display()} the {self.table} {self.object_str}'
+        return s
+
+
+    @classmethod
+    def create_entry(cls, user, action, instance=None, table=None, **kwargs):
+        object_id = kwargs.pop('object_id', instance.id if instance else None)
+        table = kwargs.pop('table', instance.table.capitalize() if instance else table)
+        object_str = kwargs.pop('object_str', str(instance) if instance else None)
+        if instance and table == "Review":
+            object_str = str(instance.album)
+
+        entry = cls(
+                table = table,
+                object_id = object_id,
+                object_str = object_str,
+                action = action,
+                user = user,
+                **kwargs,
+            )
+        entry.save()
+
+    class Meta:
+        ordering = ('-action_time',)
+
+
+"""
+Save an old copy of the instance so we can compare it
+to get changed fields
+"""
+def pre_save_handler(sender, instance, **kwargs):
+    if instance.pk:
+        instance._pre_save_instance = copy.deepcopy(sender.objects.get(pk=instance.pk))
+
+
+# https://stackoverflow.com/a/8874383/22390568
+def get_request():
+    import inspect
+    for frame_record in inspect.stack():
+        if frame_record[3]=='get_response':
+            request = frame_record[0].f_locals['request']
+            return request
+    else:
+        request = None
+        return
+
+"""
+Every time we save, create a LogEntry
+"""
+def post_save_handler(sender, instance, created, **kwargs):
+
+    request = get_request()
+    if not request:
+        return
+    # don't even make a logentry if we don't have the request
+
+    changed_fields = None
+    if created:
+        action = ADDITION
+    else:
+        action = CHANGE
+        # get changed fields
+        if hasattr(instance, '_pre_save_instance'):
+            old_instance = instance._pre_save_instance
+            changed_fields = []
+            for field in DETAIL_FIELDS[instance.table.capitalize()]:
+                old_value = getattr(old_instance, field)
+                new_value = getattr(instance, field)
+                if getattr(old_instance, field) != getattr(instance, field):
+                    changed_fields.append([field, old_value, new_value])
+
+    LibraryEntry.create_entry(
+        user = request.user,
+        action = action,
+        instance = instance,
+        changed_fields = changed_fields,
+    )
+
+def post_delete_handler(sender, instance, **kwargs):
+    request = get_request()
+    if not request:
+        return
+    # don't even make a logentry if we don't have the request
+
+    LibraryEntry.create_entry(
+        user = request.user,
+        action = DELETION,
+        instance = instance,
+    )
+
+models_to_connect = [Review, User, Genre, Subgenre, Album, Artist, Label]
+for model in models_to_connect:
+    pre_save.connect(pre_save_handler, sender=model)
+    post_save.connect(post_save_handler, sender=model)
+    post_delete.connect(post_delete_handler, sender=model)

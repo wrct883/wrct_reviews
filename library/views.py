@@ -2,7 +2,12 @@ from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.views import generic
-from .models import Album, Artist, Label, Genre, Review, Subgenre
+from .models import (
+    Review, Album,
+    LibraryEntry,
+    ADDITION, CHANGE, DELETION,
+    DETAIL_FIELDS, SEARCH_FIELDS, LIST_FIELDS,
+)
 
 from datetime import datetime, timedelta
 from django.utils import timezone
@@ -53,15 +58,6 @@ def index(request):
 
     return render(request, "library/index.html", context)
 
-DETAIL_FIELDS = {
-        'Album': ('artist', 'album', 'label', 'genre', 'subgenre', 'year', 'date_added', 'date_removed', 'status', 'format'),
-        'Artist': ('artist', 'short_name', 'comment'),
-        'Genre': ('genre'),
-        'Subgenre': ('genre', 'subgenre'),
-        'Label': ('label', 'contact_person', 'email', 'address', 'city', 'state', 'phone', 'comment'),
-        'Review': ('user', 'date_added', 'album', 'review'),
-        'User': ('username', 'first_name', 'last_name', 'djname', 'phone', 'email', 'auth_level'),
-}
 def detail(request, table, pk):
     ModelClass = apps.get_model(app_label='library', model_name=table)
     obj = get_object_or_404(ModelClass, pk=pk)
@@ -79,24 +75,6 @@ def profile(request, pk=None):
         pk = request.user.id
     return detail(request, 'User', pk)
 
-SEARCH_FIELDS = {
-    'Album': ['album', 'artist'],
-    'Artist': ['artist', 'short_name'],
-    'Genre': ['genre'],
-    'Subgenre': ['genre', 'subgenre'],
-    'Label': ['label', 'contact_person', 'email', 'address', 'city', 'state', 'phone', 'comment'],
-    'Review': ['album', 'review'],
-    'User': ['first_name', 'last_name', 'username', 'djname'],
-}
-LIST_FIELDS = {
-        'Album': ('artist', 'album', 'label', 'genre', 'year', 'date_added', 'date_removed', 'status', 'format'),
-        'Artist': DETAIL_FIELDS['Artist'],
-        'Genre': DETAIL_FIELDS['Genre'],
-        'Subgenre': DETAIL_FIELDS['Subgenre'],
-        'Label': DETAIL_FIELDS['Label'],
-        'Review': DETAIL_FIELDS['Review'],
-        'User': DETAIL_FIELDS['User'],
-}
 def list(request, table = None):
     """
     Produces a list of objects either from a search form, or from a url
@@ -205,6 +183,12 @@ def create(request, table, related=None, related_pk=None, pk=None):
             obj.save()
             form.save_m2m()
             verb = 'created' if not pk else 'updated'
+            '''action = ADDITION if not pk else CHANGE
+            LibraryEntry.create_entry(
+                user = request.user,
+                action = action,
+                instance = obj
+            )'''
             messages.success(request, f"{obj.table} {verb} successfully")
             return HttpResponseRedirect(obj.get_absolute_url())
 
@@ -235,7 +219,16 @@ def delete(request, table, pk):
     #form = CREATE_FORMS[table](data = request.POST or None, related = related, related_obj = related_obj)
     if request.method == 'POST':
         if canDelete:
+            table = obj.table
+            object_id = obj.id
             obj.delete()
+            '''LibraryEntry.create_entry(
+                user = request.user,
+                action = DELETION,
+                table = obj.table,
+                object_id = obj.id,
+                object_str = str(obj),
+            )'''
             messages.success(request, f"{table} deleted successfully")
         else:
             messages.error(request, "you do not have permission to perform this action")
@@ -247,3 +240,17 @@ def delete(request, table, pk):
         "canDelete": canDelete,
     }
     return render(request, 'library/delete.html', context)
+
+
+
+class ActionListView(generic.list.ListView):
+    model = LibraryEntry
+    paginate_by = 100
+    template_name = 'library/actions.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["ADDITION"] = ADDITION
+        context["DELETION"] = DELETION
+        context["CHANGE"] = CHANGE
+        return context

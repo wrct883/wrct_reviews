@@ -56,7 +56,7 @@ class LibraryCreateFormMixin(forms.ModelForm):
                     field.widget = CustomSelectWidget(field_name, selected=selected, instance=self.instance)
 
             if field_name == 'subgenre':
-                print('TODO', field, field.__dict__)
+                print('TODO subgenre forms.py', field, field.__dict__)
 
 
 """
@@ -92,6 +92,7 @@ class SubgenreForm(LibraryCreateFormMixin, forms.ModelForm):
         fields = '__all__'
 
 class ReviewForm(LibraryCreateFormMixin, forms.ModelForm):
+    error_css_class = "error"
     class Meta:
         model = Review
         fields = '__all__'
