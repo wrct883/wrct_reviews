@@ -108,6 +108,7 @@ def migrate_users():
 
         if date_trained and date_trained.year < 100:
             date_trained = date_trained.replace(year = date_trained.year + 1900)
+        auth_level = auth_level if auth_level and len(auth_level) <= 5 else "user"
         new_user = User(
                     username = username,
                     first_name = fname,
@@ -119,7 +120,10 @@ def migrate_users():
                     auth_level = auth_level if auth_level else "user",
                     olddb_id = olddb_id
                 )
-        new_user.save()
+        try:
+            new_user.save()
+        except Exception as e:
+            print('error', e, olddb_id)
         print(f'{i} created user {username}', end="\r")
 
 def migrate_artists():
