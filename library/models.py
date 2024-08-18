@@ -402,6 +402,7 @@ def post_save_handler(sender, instance, created, **kwargs):
                 new_value = getattr(instance, field)
                 if getattr(old_instance, field) != getattr(instance, field):
                     changed_fields.append([field, old_value, new_value])
+    print(changed_fields)
 
     LibraryEntry.create_entry(
         user = request.user,

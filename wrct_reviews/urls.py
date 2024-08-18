@@ -17,6 +17,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from django.contrib.admin import AdminSite
+
+class LibraryAdminSite(AdminSite):
+    def has_permission(self, request):
+        return request.user.is_authenticated and request.user.auth_level == 'Admin'
+
+admin_site = LibraryAdminSite(name='library_admin')
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include("django.contrib.auth.urls")),

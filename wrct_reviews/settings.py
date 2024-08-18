@@ -28,6 +28,8 @@ DEBUG = os.environ.get('DEBUG_VALUE', 'True') == 'True'
 
 ALLOWED_HOSTS = ['reviews.wrct.org', 'db.wrct.org', 'wrct.org', ]
 
+CSRF_TRUSTED_ORIGINS = ['https://' + host for host in ALLOWED_HOSTS]
+
 
 # Application definition
 

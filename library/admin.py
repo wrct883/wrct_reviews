@@ -11,6 +11,7 @@ class AlbumAdmin(admin.ModelAdmin):
     raw_id_fields = ['label', 'artist']
     search_fields = ['album']
 
+
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
     list_display = ("user", "date_added", "album")

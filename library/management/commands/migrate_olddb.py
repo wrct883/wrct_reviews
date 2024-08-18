@@ -99,7 +99,11 @@ class Command(BaseCommand):
             migrate_reviews()
 
 def migrate_users():
-    cursor.execute("SELECT UserID, User, FName, LName, DJName, Phone, Email, DateTrained, AuthLevel from Users")
+    latest_id = User.objects.filter(olddb_id__isnull=False).order_by("-olddb_id").first()
+    where_str=''
+    if latest_id:
+        where_str = f' WHERE UserID > {latest_id.olddb_id}'
+    cursor.execute("SELECT UserID, User, FName, LName, DJName, Phone, Email, DateTrained, AuthLevel from Users" + where_str)
     for i, old_user in enumerate(cursor):
         olddb_id, username, fname, lname, djname, phone, email, date_trained, auth_level = old_user
         if User.objects.filter(olddb_id = olddb_id):
@@ -127,7 +131,11 @@ def migrate_users():
         print(f'{i} created user {username}', end="\r")
 
 def migrate_artists():
-    cursor.execute("SELECT ArtistID, Artist, ShortName, Comment from Artists")
+    latest_id = Artist.objects.filter(olddb_id__isnull=False).order_by("-olddb_id").first()
+    where_str=''
+    if latest_id:
+        where_str = f' WHERE ArtistID > {latest_id.olddb_id}'
+    cursor.execute("SELECT ArtistID, Artist, ShortName, Comment from Artists" + where_str)
     for i, old_artist in enumerate(cursor):
         olddb_id, artist, short_name, comment = old_artist
         if Artist.objects.filter(olddb_id=olddb_id):
@@ -143,7 +151,11 @@ def migrate_artists():
         print(f'{olddb_id} created artist {artist}', end="\r")
 
 def migrate_labels():
-    cursor.execute("SELECT LabelID, Label, ContactPerson, Email, Address, City, State, Phone from Labels")
+    latest_id = Label.objects.filter(olddb_id__isnull=False).order_by("-olddb_id").first()
+    where_str=''
+    if latest_id:
+        where_str = f' WHERE LabelID > {latest_id.olddb_id}'
+    cursor.execute("SELECT LabelID, Label, ContactPerson, Email, Address, City, State, Phone from Labels" + where_str)
     for i, old_label in enumerate(cursor):
         olddb_id, label, contact_person, email, address, city, state, phone = old_label
         if Label.objects.filter(olddb_id=olddb_id):
@@ -160,7 +172,7 @@ def migrate_labels():
                     olddb_id=olddb_id,
                 )
         new_label.save()
-        print(f'{olddb_id} created label {label}')
+        print(f'{olddb_id} created label {label}', end='\r')
 
 def migrate_genres():
     cursor.execute("SELECT GenreID, Genre from Genres")
@@ -176,8 +188,12 @@ def migrate_genres():
 # an album has a genre, a label, and an artist
 def migrate_albums():
     tz = pytz.timezone('America/New_York')
+    latest_id = Album.objects.filter(olddb_id__isnull=False).order_by("-olddb_id").first()
+    where_str=''
+    if latest_id:
+        where_str = f' WHERE AlbumID > {latest_id.olddb_id}'
 # AlbumID | LabelID | GenreID | ArtistID | FormatID | Album      | Year | HighestChartPosition | DateAdded  | DateRemoved | Status | Comp | ReviewPic | ReleaseNum
-    cursor.execute("SELECT AlbumID, LabelID, GenreID, ArtistID, FormatID, Album, Year, DateAdded, DateRemoved, Status from Albums")
+    cursor.execute("SELECT AlbumID, LabelID, GenreID, ArtistID, FormatID, Album, Year, DateAdded, DateRemoved, Status from Albums" + where_str)
     for i, old_album in enumerate(cursor):
         olddb_id, label_id, genre_id, artist_id, format_id, album, year, date_added, date_removed, status = old_album
         if Album.objects.filter(olddb_id=olddb_id):
@@ -200,7 +216,7 @@ def migrate_albums():
                 year=year,
                 date_added = date_added,
                 date_removed = date_removed,
-                status = status,
+                status = status if status and len(status) <= 4 else None,
                 olddb_id = olddb_id,
                 format = format_id,
             )
