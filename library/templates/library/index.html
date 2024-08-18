@@ -46,7 +46,7 @@
   </a>
   {% if tables.albums.objects %}
   {% include "library/includes/pagination.html" with page=tables.albums.objects param=tables.albums.param %}
-  {% include "library/includes/table.html" with table_obj=tables.albums fields="album label artist format year date_added status" truncateRows=True class="mt1-5" %}
+  {% include "library/includes/table.html" with table_obj=tables.albums fields="album artist label format year date_added status" truncateRows=True class="mt1-5" %}
   {% endif %}
 </section>
 

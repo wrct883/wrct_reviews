@@ -80,8 +80,8 @@ def index(request):
     albums = Album.objects.filter(date_added__gt = album_period, date_added__lt=timezone.now())
 
     tables = {}
-    add_table(request, tables, reviews, 'reviews')
-    add_table(request, tables, albums, 'albums')
+    add_table(request, tables, reviews, 'reviews', count=10)
+    add_table(request, tables, albums, 'albums', count=10)
 
     context = {
         "indexView": True,
@@ -97,8 +97,10 @@ def detail(request, table, pk):
     tables = {}
     if table == 'Artist' or table == 'Label':
         add_table(request, tables, obj.album_set.all(), 'album')
-    elif table == "Album":
+    elif table == "Album" or table == 'User':
         add_table(request, tables, obj.review_set.all(), 'review')
+    elif table == "Genre":
+        add_table(request, tables, obj.subgenre_set.all(), 'subgenre')
 
     context = {
         'table': table,
@@ -177,7 +179,7 @@ def list(request, table = None):
         return HttpResponseRedirect(reverse("library:detail", kwargs={'table': table.lower(), 'pk': objects.first().pk}))
 
     if isJsonView:
-        data = [obj.json for obj in objects_paged]
+        data = [obj.json for obj in tables['list']['objects']]
         return JsonResponse(data=data, safe=False)
 
     context = {
@@ -229,13 +231,10 @@ def create(request, table, related=None, related_pk=None, pk=None):
             obj.save()
             form.save_m2m()
             verb = 'created' if not pk else 'updated'
-            '''action = ADDITION if not pk else CHANGE
-            LibraryEntry.create_entry(
-                user = request.user,
-                action = action,
-                instance = obj
-            )'''
             messages.success(request, f"{obj.table} {verb} successfully")
+
+            if table == 'Subgenre' and related == 'Album':
+                related_obj.subgenre.add(obj)
             return HttpResponseRedirect(obj.get_absolute_url())
 
     context = {
@@ -268,13 +267,6 @@ def delete(request, table, pk):
             table = obj.table
             object_id = obj.id
             obj.delete()
-            '''LibraryEntry.create_entry(
-                user = request.user,
-                action = DELETION,
-                table = obj.table,
-                object_id = obj.id,
-                object_str = str(obj),
-            )'''
             messages.success(request, f"{table} deleted successfully")
         else:
             messages.error(request, "you do not have permission to perform this action")

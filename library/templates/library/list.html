@@ -6,7 +6,7 @@
 {% block content %}
 <main class='big'>
   <div class="list-links">
-    {% for ftable, label in form.table.field.choices %}<span><a href="{% url 'library:list' ftable %}"{% if ftable == table|lower %} class="active"{% endif %}>{{ label }}</a></span>{% endfor %}
+    {% for ftable, label in form.table.field.choices %}<span><a href="{% url 'library:list' ftable %}"{% if ftable == table|lower %} class="active"{% endif %}>{{ label }}</a> </span> {% endfor %}
   </div>
   <h1 class='large'>{{ table }}s</h1>
   <a href='{% url "library:index" %}'>&#8592; back to home</a>
@@ -17,7 +17,7 @@
     </button>
   </a></p>
 
-  <form action="{% url 'library:search' %}" method="post">
+  <form action="{% url 'library:search' %}" method="post" class='search-form'>
     {% csrf_token %}
     Find {{ form.table }} that {{ form.pos }} {{ form.query }}
     <button class='small gray' type="submit">search</button>

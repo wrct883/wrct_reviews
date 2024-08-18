@@ -1,11 +1,12 @@
 {% extends "base.html" %}
+{% load static %}
 {% load library_filters %}
 {% block title %}wrct database : {{ object }}{% endblock %}
 
 {% block content %}
 <main class='detail'>
   <h1 class='large'>{{ table }}: {{ object }}</h1>
-  <a href='{% url "library:index" %}'>&#8592; back to home</a>
+  <a href='{% url "library:list" object.table %}'>&#8592; back to {{ table }}s</a>
   <div class="grid mt1-5">
     {% for field in fields %}
     <p class='subtitle'><b>{{ object|verbose_name:field }}: </b><span>{{ object|lookup:field }}</span></p>
@@ -13,44 +14,79 @@
   </div>
 
   <aside class='side-panel'>
-    <h2>Editing links</h2>
-    <ul>
-      <li><a href="{% url 'library:update' object.table object.pk %}">Edit this {{ table }}</a></li>
-      <li><a href="{% url 'library:delete' object.table object.pk %}">Delete this {{ table }}</a></li>
-      {% if table == "Album" %}
-      <li><a href="{% url 'library:create' object.table object.pk 'review' %}">Review this {{ table }}</a></li>
-      <li><a href="#">Add a subgenre classification for this {{ table }}</a></li>
-      {% endif %}
-    </ul>
+    <div class='edit-links'>
+      <h2>Editing links</h2>
+      <ul>
+        <li><a href="{% url 'library:update' object.table object.pk %}">Edit this {{ table }}</a></li>
+        <li><a href="{% url 'library:delete' object.table object.pk %}">Delete this {{ table }}</a></li>
+        {% if table == "Album" %}
+        <li><a href="{% url 'library:create' object.table object.pk 'review' %}">Review this {{ table }}</a></li>
+        <li><a href="{% url 'library:create' object.table object.pk 'subgenre' %}">Add a subgenre classification for this {{ table }}</a></li>
+        {% endif %}
+      </ul>
+    </div>
+    {% if table == "Album" or table == "Artist" %}<div id="api-info" style="display: contents;"></div>{% endif %}
   </aside>
 
-  {% if table == "Album" %}
-  <h1>Reviews</h1>
-  {% if not object.review_set.all %}
-  <p>There are no reviews for this album yet. Be the first to review it!</p>
-  {% endif %}
-  <a href="{% url 'library:create' object.table object.pk 'review' %}">
-    <button class="outline mb1">
-      Review this album <b class='icon'>+</b>
-    </button>
-  </a>
-  {% if object.review_set.all %}
-  {% include "library/includes/table.html" with table_obj=tables.review fields="user review" %}
-  {% endif %}
+  {% if table == "Album" or table == "User" and tables.review.objects %}
+  <section>
+    <h1>Reviews</h1>
+    {% if not tables.review.objects %}
+    <p>There are no reviews for this album yet. Be the first to review it!</p>
+    {% endif %}
+    {% if table == "Album" %}
+    <a href="{% url 'library:create' object.table object.pk 'review' %}">
+      <button class="outline mb1">
+        Review this album <b class='icon'>+</b>
+      </button>
+    </a>
+    {% endif %}
+    {% if object.review_set.all %}
+    {% if table == "Album" %}{% include "library/includes/table.html" with table_obj=tables.review fields="user review" %}
+    {% else %}{% include "library/includes/table.html" with table_obj=tables.review fields="date_added album review" truncateRows=True %}
+    {% endif %}
+    {% endif %}
+  </section>
   {% elif table == "Label" or table == "Artist" %}
-  <h1>Related Albums</h1>
-  <a href="{% url 'library:create' object.table object.pk 'album' %}">
-    <button class="outline mb1">
-      Add an album here <b class='icon'>+</b>
-    </button>
-  </a>
-  {% if tables.album.objects %}
-  {% include "library/includes/table.html" with table_obj=tables.album fields="album year artist" %}
-  {% else %}
-  <p>This {{ table|lower }} doesn't have any associated albums.</p>
-  {% endif %}
+  <section>
+    <h1>Related Albums</h1>
+    <a href="{% url 'library:create' object.table object.pk 'album' %}">
+      <button class="outline mb1">
+        Add an album here <b class='icon'>+</b>
+      </button>
+    </a>
+    {% if tables.album.objects %}
+    {% include "library/includes/table.html" with table_obj=tables.album fields="album year artist" %}
+    {% else %}
+    <p>This {{ table|lower }} doesn't have any associated albums.</p>
+    {% endif %}
+  </section>
+  {% elif table == "Genre" %}
+  <section>
+    <h1>Subgenres</h1>
+    <a href="{% url 'library:create' object.table object.pk 'subgenre' %}">
+      <button class="outline mb1">
+        Add a subgenre here <b class='icon'>+</b>
+      </button>
+    </a>
+    {% if tables.subgenre.objects %}
+    {% include "library/includes/table.html" with table_obj=tables.subgenre fields="subgenre" %}
+    {% else %}
+    <p>This genre doesn't have any associated subgenres.</p>
+    {% endif %}
+  </section>
   {% endif %}
 </main>
 {% endblock %}
 
 
+{% block scripts %}
+{% if table == "Album" or table == "Artist" %}
+<script>
+  const table = "{{ table }}";
+  const album = "{{ object.album }}";
+  const artist = "{{ object.artist }}";
+</script>
+<script type="text/javascript" src="{% static 'js/music_api.js' %}"></script>
+{% endif %}
+{% endblock %}

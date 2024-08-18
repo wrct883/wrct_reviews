@@ -1,0 +1,12 @@
+{% load library_filters %}
+<div id="id_subgenre">
+{% for group_name, group_choices, group_index in widget.optgroups %}
+  {% for option in group_choices %}
+  <div data-genre="{{ option.label.genre }}">
+    <label>
+      <input type="checkbox" name="{{ widget.name }}" value="{{ option.value }}"{% if option.value in value %} checked{% endif %}{% include "django/forms/attrs.html" with attrs=option.attrs %}>{{ option.label }}
+    </label>
+  </div>
+  {% endfor %}
+{% endfor %}
+</div>

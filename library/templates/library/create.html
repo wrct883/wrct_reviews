@@ -1,13 +1,19 @@
 {% extends "base.html" %}
+{% load static %}
 {% load library_filters %}
-{% block title %}wrct database : add a new {{ table }}{% endblock %}
+{% block title %}wrct database : {% if object %}update {{ table }}: {{ object }}{% else %}add a new {{ table }}{% endif %}{% endblock %}
 
 {% block content %}
 <main>
+  {% if not object %}{% with tables="album artist genre label review user"|parse_array %}
+  <div class="list-links">
+    {% for ftable in tables %}<span><a href="{% url 'library:create' ftable %}"{% if ftable == table|lower %} class="active"{% endif %}>{{ ftable|capfirst }}</a> </span> {% endfor %}
+  </div>
+  {% endwith %}{% endif %}
   <h1 class='large'>{% if object %}update {{ table }}: {{ object }}{% else %}add a new {{ table }}{% endif %}</h1>
   {% if object %}<a href='{% url "library:detail" object.table object.id %}'>&#8592; back to {{ object.table }} {{ object }}</a>
   {% elif related %}<a href='{% url "library:detail" related.table related.id %}'>&#8592; back to {{ related.table }} {{ related }}</a>
-  {% else %}<a href='{% url "library:index" %}'>&#8592; back to home</a>{% endif %}
+  {% else %}<a href='{% url "library:list" table|lower %}'>&#8592; back to {{ table }}s</a>{% endif %}
 
   <form class='form mt1-5' method="post">
     {% csrf_token %}
@@ -17,98 +23,8 @@
     <button type="submit" class="outline mt1-5">submit</button>
   </form>
 </main>
-
-<script>
-  function debounce(func, delay) {
-    let timeout;
-    return function(...args) {
-      const context = this;
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func.apply(context, args), delay);
-    };
-  }
-
-  let xhr = new XMLHttpRequest();
-  xhr.timeout = 5 * 1000; // 5 seconds
-  xhr.responseType = 'json';
-
-  function clearResults(resultsEl) {
-    resultsEl.innerHTML = "";
-  }
-  function hideResults(resultsEl) {
-    resultsEl.classList.add("hidden");
-  }
-  function showResults(resultsEl) {
-    resultsEl.classList.remove("hidden");
-  }
-
-  function populateResults(json, searchEl, resultsEl, hiddenEl) {
-    json.forEach((obj) => {
-      var el = document.createElement("div");
-      el.classList.add("search-result");
-      var name = document.createElement("div");
-      name.classList.add("name");
-      name.innerText = obj.name;
-      el.appendChild(name);
-      if (obj.artist) {
-        var subtitle = document.createElement("div");
-        subtitle.classList.add("subtitle");
-        subtitle.innerText = obj.artist;
-        el.appendChild(subtitle);
-      }
-
-      el.addEventListener("click", () => {
-        searchEl.value = obj.name;
-        hiddenEl.value = obj.id;
-        clearResults(resultsEl);
-      });
-
-      resultsEl.appendChild(el);
-    });
-  }
-
-  function search(endpoint, query, searchEl, resultsEl, hiddenEl) {
-    var url = `${endpoint}?pos=istartswith&query=${query}`;
-    xhr.open('GET', url);
-    xhr.send();
-    xhr.onload = function() {
-      if (xhr.status != 200) { // analyze HTTP status of the response
-        console.log(xhr.status, xhr.statusText);
-      } else { // show the result
-        clearResults(resultsEl);
-        populateResults(xhr.response, searchEl, resultsEl, hiddenEl);
-        searchEl.setAttribute("data-prev-query", searchEl.value);
-      }
-    };
-  }
-
-  const searchEls = document.querySelectorAll('.search');
-  searchEls.forEach((el) => {
-    const searchEl = el.querySelector("input[type='text']");
-    const resultsEl = el.querySelector(".results");
-    const hiddenEl = el.querySelector("input[type='hidden']");
-    const endpoint = `/search/${hiddenEl.name}`;
-    searchEl.addEventListener('keyup', debounce((event) => {
-
-      var query = searchEl.value;
-      if (!query.trim())
-        hiddenEl.value = "";
-      else if (query !== searchEl.getAttribute("data-prev-query")) {
-        search(endpoint, searchEl.value, searchEl, resultsEl, hiddenEl);
-      }
-
-      console.log(event);
-    }, 300));
-
-    searchEl.addEventListener("blur", () => {
-      setTimeout(() => {hideResults(resultsEl)}, 200);
-    });
-
-    searchEl.addEventListener("focus", () => {
-      showResults(resultsEl);
-    });
-  });
-</script>
 {% endblock %}
 
-
+{% block scripts %}
+<script type="text/javascript" src="{% static 'js/create.js' %}"></script>
+{% endblock %}

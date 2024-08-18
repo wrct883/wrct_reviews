@@ -11,9 +11,8 @@ from .models import (
     User,
 )
 
-
 # TODO: make this a constant with converters and views.py
-TABLE_CHOICES = [('album', 'Albums'), ('artist', 'Artists'), ('genre', 'Genres'), ('label', 'Labels'), ('review', 'Reviews'), ('user', 'Users')]
+TABLE_CHOICES = [('album', 'Albums'), ('artist', 'Artists'), ('label', 'Labels'), ('review', 'Reviews'), ('genre', 'Genres'), ('user', 'Users')]
 POS_CHOICES = [('icontains', 'include'), ('istartswith', 'start with'), ('iendswith', 'end with'), ('iexact', 'match exactly')]
 class SearchForm(forms.Form):
     table = forms.ChoiceField(choices=TABLE_CHOICES)
@@ -22,11 +21,9 @@ class SearchForm(forms.Form):
 
 
 class CustomSelectWidget(forms.Select):
-    template_name = 'library/select.html'  # Optionally, create a custom template for your widget
+    template_name = 'library/forms/select.html'
 
     def __init__(self, field_name, selected=None, instance=None):
-        # TODO:
-        # use the field name, get all possible valid options
         if instance and getattr(instance, field_name):
             initial = getattr(instance, field_name)
             super().__init__(choices = [(initial.id, str(initial))])
@@ -36,8 +33,15 @@ class CustomSelectWidget(forms.Select):
             return
         super().__init__()
 
+class CustomSubgenreWidget(forms.CheckboxSelectMultiple):
+    template_name = 'library/forms/subgenre.html'
+
+    def __init__(self, queryset):
+        choices = [(obj.id, obj) for obj in queryset]
+        super().__init__(choices = choices)
+
 class LibraryCreateFormMixin(forms.ModelForm):
-    error_css_class = "error"
+    error_css_class = "error no-contents"
 
     def __init__(self, *args, **kwargs):
         related = kwargs.pop('related')
@@ -45,7 +49,7 @@ class LibraryCreateFormMixin(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         ## custom excluded fields
-        for field_name in ['user', 'date_added', 'date_removed', 'olddb_id']:
+        for field_name in ['user', 'date_added', 'date_removed', 'olddb_id', 'short_name']:
             if field_name in self.fields:
                 self.fields.pop(field_name)
 
@@ -57,8 +61,8 @@ class LibraryCreateFormMixin(forms.ModelForm):
                     selected = related_obj if related and related.lower() == field_name else None
                     field.widget = CustomSelectWidget(field_name, selected=selected, instance=self.instance)
 
-            if field_name == 'subgenre':
-                print('TODO subgenre forms.py', field, field.__dict__)
+                if field_name == 'subgenre':
+                    field.widget = CustomSubgenreWidget(queryset=field._queryset)
 
 
 """

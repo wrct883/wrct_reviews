@@ -10,23 +10,6 @@ function setParam(param, page) {
     window.location.href = newUrl;
 }
 
-/*function shuffleOrdering(ordering_str, param='o', id=null) {
-  var current_ordering = urlParams.get(param);
-  var desc_ordering = '-' + ordering_str;
-  urlParams.set(param, desc_ordering);
-  // if there is already an ordering, and that ordering is the same as the descending one...
-  if (current_ordering && current_ordering == desc_ordering)
-    urlParams.set(param, ordering_str); // set it to be ascending now
-  else if (current_ordering && current_ordering == ordering_str)
-    urlParams.delete(param); // clear it
-
-  var newUrl = window.location.pathname + '?' + urlParams.toString();
-  if (id)
-    newUrl += "#" + id;
-  window.location.href = newUrl;
-}*/
-/* ?param=field1.-field2.field3 etc
- * */
 const ORDERING_SUFFIX = "_o";
 const ORDERING_DIV = "."
 function shuffleOrdering(field, param) {
@@ -61,23 +44,6 @@ function shuffleOrdering(field, param) {
   window.location.href = newUrl;
 }
 
-// add up/down carets to all the fields in an ordered table
-/*function tableOrdering() {
-  urlParams.forEach((value, orderingParam) => {
-    // if it's not an ordering param, return
-    if (!orderingParam.endsWith(ORDERING_SUFFIX))
-      return;
-    var param = orderingParam.substring(0, orderingParam.length-ORDERING_SUFFIX.length);
-    var table = document.querySelector(`#${param}`);
-    if (!table)
-      return;
-
-    var values = value.split(".");
-  })
-}
-tableOrdering();*/
-
-
 // remove a tags that point to the current page
 function removeSelfLinks() {
   const links = document.querySelectorAll('a:not(nav a):not(.active)');
@@ -95,7 +61,7 @@ removeSelfLinks();
 // make the search inputs have those selected
 function setSearchForm() {
   var path = window.location.pathname;
-  var tables = ['album', 'artist', 'genre', 'review', 'label'];
+  var tables = ['album', 'artist', 'genre', 'review', 'label', 'user'];
   var table;
   for (var i = 0; i < tables.length; i++) {
     table = tables[i];

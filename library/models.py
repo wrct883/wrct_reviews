@@ -13,9 +13,9 @@ import copy
 
 
 DETAIL_FIELDS = {
-    'Album': ('artist', 'album', 'label', 'genre', 'subgenre', 'year', 'date_added', 'date_removed', 'status', 'format'),
-    'Artist': ('artist', 'short_name', 'comment'),
-    'Genre': ('genre'),
+    'Album': ('album', 'artist', 'label', 'genre', 'subgenre', 'year', 'date_added', 'date_removed', 'status', 'format'),
+    'Artist': ('artist', 'comment'),
+    'Genre': ('genre',),
     'Subgenre': ('genre', 'subgenre'),
     'Label': ('label', 'contact_person', 'email', 'address', 'city', 'state', 'phone', 'comment'),
     'Review': ('user', 'date_added', 'album', 'review'),
@@ -23,7 +23,7 @@ DETAIL_FIELDS = {
 }
 SEARCH_FIELDS = {
     'Album': ['album', 'artist'],
-    'Artist': ['artist', 'short_name'],
+    'Artist': ['artist',],
     'Genre': ['genre'],
     'Subgenre': ['genre', 'subgenre'],
     'Label': ['label', 'contact_person', 'email', 'address', 'city', 'state', 'phone', 'comment'],
@@ -31,7 +31,7 @@ SEARCH_FIELDS = {
     'User': ['first_name', 'last_name', 'username', 'djname'],
 }
 LIST_FIELDS = {
-    'Album': ['artist', 'album', 'label', 'genre', 'year', 'date_added', 'date_removed', 'status', 'format'],
+    'Album': ['album', 'artist', 'label', 'genre', 'year', 'date_added', 'date_removed', 'status', 'format'],
     'Artist': DETAIL_FIELDS['Artist'],
     'Genre': DETAIL_FIELDS['Genre'],
     'Subgenre': DETAIL_FIELDS['Subgenre'],
@@ -202,7 +202,7 @@ class Subgenre(models.Model):
 
 class Album(models.Model):
     album = models.CharField(max_length=255, default='')
-    artist = models.ForeignKey(Artist, on_delete=models.SET_NULL, null=True, blank=True)
+    artist = models.ForeignKey(Artist, on_delete=models.SET_NULL, null=True)
     label = models.ForeignKey(Label, on_delete=models.SET_NULL, null=True, blank=True)
     genre = models.ForeignKey(Genre, on_delete=models.SET_NULL, null=True, blank=True)
     subgenre = models.ManyToManyField(Subgenre, blank=True)
@@ -383,7 +383,6 @@ def get_request():
 Every time we save, create a LogEntry
 """
 def post_save_handler(sender, instance, created, **kwargs):
-
     request = get_request()
     if not request:
         return

@@ -45,7 +45,7 @@ def lookup(obj, field):
         string_rep = obj.get_format_display()
     elif field == 'status':
         string_rep = obj.get_status_display()
-    elif field == 'subgenre':
+    elif field == 'subgenre' and not isinstance(attr, str):
         string_rep = ', '.join([str(sgenre) for sgenre in obj.subgenre.all()])
     elif isinstance(attr, date) or isinstance(attr, datetime):
         string_rep = attr.strftime("%Y-%m-%d")

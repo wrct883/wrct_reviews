@@ -4,28 +4,15 @@ TODO:
     * permission: only admin can make another user an admin, only exec can make another user exec, etc
 * authentication via oauth
 
-* make subgenres only show whatever genre is selected (need to modify genre select and subgenre widgets)
-
-* add links to listen to an album on spotify/apple music?
-    * holy shit, can we integrate this with the spinitron api to get play data on albums/artists on our site??
-* add an api call to get album art?
 * add autocomplete on create search
 
 * bulk actions? just bulk delete, really
 * "add another `table` like this function" - editing link
 
 looks:
-* messages css
 * add the little icons from the old bin back to the edit links, I liked those
-* for `comment` and `review` labels, add my own css to those
 
 * set `date_removed` when updating an item from the bin, to not be in the bin
-
-spinitron integration??
-* creating a user automatically creates a spinitron user?
-* you can view artist spins on the artist detail page
-* you can view album spins on the album detail page
-    * also do album art
 
 ## 2024-08-14
 * library tables: review, album, artist, label, genre
@@ -67,9 +54,22 @@ DONE:
 DONE:
 * dynamic, sortable, includable tables finally finished :))
 
+DONE:
+* subgenre filtering using js
+* album art / last fm data on album page
+* media queries
+* "add a subgenre for this album" - editing link
+
 NEXT:
-* subgenre filtering (js?)
-* album art / spinitron on album page?
+* auth level permissions (only admin can make admin, etc)
+* auth
+* deploy
+
+
+wrct db
+API key 	8c96e05d82dcc8bd73ad54b96dd26c25
+Shared secret 	2f0b39da6295da2f14793521add274a3
+Registered to 	wrct883fm
 
 ---
 # todo i made for chris
