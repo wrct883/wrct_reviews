@@ -154,6 +154,7 @@ button:disabled {
   background-color: var(--light-gray);
   border-radius: 4px;
   padding: 0 1em 1em 1em;
+  border: 1px solid var(--light-gray);
 }
 .header > div {
   border: 1px solid var(--gray);
@@ -188,12 +189,9 @@ td, th { padding: 0.5em; text-align: left; }
 th.pointer:hover { background-color: #eee !important; }
 td.pointer:hover { background-color: rgba(0,0,0,0.2) !important; }
 .scrollable {
-  /*display: block;*/
+  display: block;
   max-width: 100%;
   overflow-x: auto;
-}
-table.scrollable, table.scrollable tbody {
-  min-width: 100%;
 }
 
 h1.large {

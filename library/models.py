@@ -31,12 +31,21 @@ SEARCH_FIELDS = {
     'User': ['first_name', 'last_name', 'username', 'djname'],
 }
 LIST_FIELDS = {
-    'Album': ('artist', 'album', 'label', 'genre', 'year', 'date_added', 'date_removed', 'status', 'format'),
+    'Album': ['artist', 'album', 'label', 'genre', 'year', 'date_added', 'date_removed', 'status', 'format'],
     'Artist': DETAIL_FIELDS['Artist'],
     'Genre': DETAIL_FIELDS['Genre'],
     'Subgenre': DETAIL_FIELDS['Subgenre'],
     'Label': DETAIL_FIELDS['Label'],
     'Review': DETAIL_FIELDS['Review'],
+    'User': DETAIL_FIELDS['User'],
+}
+SORTABLE_FIELDS = {
+    'Album': DETAIL_FIELDS['Album'],
+    'Artist': DETAIL_FIELDS['Artist'],
+    'Genre': DETAIL_FIELDS['Genre'],
+    'Subgenre': DETAIL_FIELDS['Subgenre'],
+    'Label': ["label"],
+    'Review': ["album", "date_added", "user"],
     'User': DETAIL_FIELDS['User'],
 }
 

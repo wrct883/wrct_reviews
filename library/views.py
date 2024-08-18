@@ -6,7 +6,7 @@ from .models import (
     User, Review, Album,
     LibraryEntry,
     ADDITION, CHANGE, DELETION,
-    DETAIL_FIELDS, SEARCH_FIELDS, LIST_FIELDS,
+    DETAIL_FIELDS, SEARCH_FIELDS, LIST_FIELDS, SORTABLE_FIELDS,
 )
 
 from datetime import datetime, timedelta
@@ -28,44 +28,85 @@ from .forms import (
     UserForm,
 )
 
-def do_url_params(request, context, queryset, param):
-    ordering = request.GET.get(param)
+PAGINATION_COUNT = 25
+ORDERING_SUFFIX = "_o"
+def add_table(request, table_dict, queryset, param, name=None, count=PAGINATION_COUNT):
+    """
+    request: the WSGI request object
+    table_dict: dict to add the generated, paginated/ordered queryset to
+    queryset: the queryset/collection of objects to paginate/order
+    param: the page parameter for the table (page, albums, etc)
+    name: optional, the name to call in the template to access this table
+    """
+    name = name if name else param
+    table = queryset.model.__name__
+
+    ordering = request.GET.get(param + ORDERING_SUFFIX)
+    field_orders = {}
     if ordering:
-        field_name = ordering if ordering[0] != '-' else ordering[1:]
-        queryset = queryset.order_by(ordering).filter(**{f'{field_name}__isnull': False})
-        context[param] = ordering
-    return queryset
+        try:
+            order_fields = []
+            for o in ordering.split("."):
+                reverse = o[0] if o.startswith('-') else ''
+                fname = o[1:] if o.startswith('-') else o
+                if fname in ["album", "artist", "genre", "label", "subgenre"] and fname != table.lower():
+                    order_fields.append(f'{reverse}{fname}__{fname}')
+                else:
+                    order_fields.append(o)
+
+                field_orders[fname] = "▼" if reverse else "▲"
+            queryset = queryset.order_by(*order_fields)
+        except Exception as e:
+            print(e)
+            messages.error(request, "invalid ordering parameter")
+
+    objects_paginator = Paginator(queryset, count)
+    objects_page_number = request.GET.get(param)
+    objects_paged = objects_paginator.get_page(objects_page_number)
+
+    table_dict[name] = {
+        "objects": objects_paged,
+        "field_orders": field_orders,
+        "param": param,
+        "sortable": SORTABLE_FIELDS[table],
+        "fields": LIST_FIELDS[table],
+    }
 
 def index(request):
-    context = {"indexView": True}
     review_period = datetime.now() - timedelta(days=30*3)
     reviews = Review.objects.filter(date_added__gt = review_period, date_added__lt=timezone.now())
-    reviews = do_url_params(request, context, reviews, 'ro')
-
-    reviews_paginator = Paginator(reviews, 10)
-    reviews_page_number = request.GET.get("rpage")
-    reviews_paged = reviews_paginator.get_page(reviews_page_number)
-    context['reviews'] = reviews_paged
 
     album_period = datetime.now() - timedelta(days=30*1)
     albums = Album.objects.filter(date_added__gt = album_period, date_added__lt=timezone.now())
-    albums = do_url_params(request, context, albums, 'ao')
 
-    albums_paginator = Paginator(albums, 10)
-    albums_page_number = request.GET.get("apage")
-    albums_paged = albums_paginator.get_page(albums_page_number)
-    context['albums'] = albums_paged
+    tables = {}
+    add_table(request, tables, reviews, 'reviews')
+    add_table(request, tables, albums, 'albums')
 
+    context = {
+        "indexView": True,
+        "tables": tables,
+    }
     return render(request, "library/index.html", context)
 
 def detail(request, table, pk):
     ModelClass = apps.get_model(app_label='library', model_name=table)
     obj = get_object_or_404(ModelClass, pk=pk)
+
+
+    tables = {}
+    if table == 'Artist' or table == 'Label':
+        add_table(request, tables, obj.album_set.all(), 'album')
+    elif table == "Album":
+        add_table(request, tables, obj.review_set.all(), 'review')
+
     context = {
         'table': table,
         'object': obj,
         'fields': DETAIL_FIELDS[table],
         'fieldsDict': DETAIL_FIELDS,
+
+        'tables': tables,
     }
     return render(request, 'library/detail.html', context)
 
@@ -119,19 +160,21 @@ def list(request, table = None):
             q_objects |= Q(**{f"{field}{f'__{field}' if isForeignKey else ''}__{pos}": query})
         objects = objects.filter(q_objects)
 
+    tables = {}
+    add_table(request,
+              table_dict = tables,
+              queryset = objects,
+              param = 'page',
+              name = "list")
+
     """
     need to decide if we're on an AJAX view here and then return json if so
     """
     isJsonView = "json" in request.resolver_match.view_name
-    #isJsonView = request.headers.get("x-requested-with") == "XMLHttpRequest"
 
     # redirect to detail page if there's only one match
     if objects.count() == 1 and not isJsonView:
         return HttpResponseRedirect(reverse("library:detail", kwargs={'table': table.lower(), 'pk': objects.first().pk}))
-
-    objects_paginator = Paginator(objects, 25)
-    objects_page_number = request.GET.get("page")
-    objects_paged = objects_paginator.get_page(objects_page_number)
 
     if isJsonView:
         data = [obj.json for obj in objects_paged]
@@ -139,10 +182,10 @@ def list(request, table = None):
 
     context = {
         "table": table,
-        "objects": objects_paged,
-        "fields": LIST_FIELDS[table],
         "form": form,
         "listView": True,
+
+        "tables": tables,
     }
     return render(request, 'library/list.html', context)
 

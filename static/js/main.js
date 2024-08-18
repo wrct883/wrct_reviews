@@ -10,7 +10,7 @@ function setParam(param, page) {
     window.location.href = newUrl;
 }
 
-function shuffleOrdering(ordering_str, param='o', id=null) {
+/*function shuffleOrdering(ordering_str, param='o', id=null) {
   var current_ordering = urlParams.get(param);
   var desc_ordering = '-' + ordering_str;
   urlParams.set(param, desc_ordering);
@@ -24,7 +24,58 @@ function shuffleOrdering(ordering_str, param='o', id=null) {
   if (id)
     newUrl += "#" + id;
   window.location.href = newUrl;
+}*/
+/* ?param=field1.-field2.field3 etc
+ * */
+const ORDERING_SUFFIX = "_o";
+const ORDERING_DIV = "."
+function shuffleOrdering(field, param) {
+  var orderingParam = param + ORDERING_SUFFIX;
+  var currentOrdering = urlParams.get(orderingParam);
+  var orderingList = currentOrdering ? currentOrdering.split(ORDERING_DIV) : [];
+  var descField = "-" + field;
+
+  // descending -> ascending -> none -> descending
+
+  console.log("start", orderingList);
+  // we're currently filtering descending -> ascending
+  if (orderingList.indexOf(descField) >= 0)
+    orderingList[orderingList.indexOf(descField)] = field;
+  // currently filtering ascending -> none
+  else if (orderingList.indexOf(field) >= 0)
+    orderingList.splice(orderingList.indexOf(field), 1);
+  // not filtering by this field -> descending
+  else
+    orderingList.push(descField);
+
+
+  if (orderingList.length > 0)
+    urlParams.set(orderingParam, orderingList.join(ORDERING_DIV));
+  else
+    urlParams.delete(orderingParam);
+
+  var newUrl = window.location.pathname;
+  if (urlParams.toString())
+    newUrl += '?' + urlParams.toString();
+  newUrl += "#" + param;
+  window.location.href = newUrl;
 }
+
+// add up/down carets to all the fields in an ordered table
+/*function tableOrdering() {
+  urlParams.forEach((value, orderingParam) => {
+    // if it's not an ordering param, return
+    if (!orderingParam.endsWith(ORDERING_SUFFIX))
+      return;
+    var param = orderingParam.substring(0, orderingParam.length-ORDERING_SUFFIX.length);
+    var table = document.querySelector(`#${param}`);
+    if (!table)
+      return;
+
+    var values = value.split(".");
+  })
+}
+tableOrdering();*/
 
 
 // remove a tags that point to the current page

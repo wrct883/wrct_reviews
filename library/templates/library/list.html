@@ -23,8 +23,8 @@
     <button class='small gray' type="submit">search</button>
   </form>
 
-  {% if objects %}
-  {% include "library/includes/table.html" with objects=objects fields=fields param="page" truncateRows=True class="mt1-5 scrollable" %}
+  {% if tables.list.objects %}
+  {% include "library/includes/table.html" with table_obj=tables.list truncateRows=True class="mt1-5" %}
   {% else %}
   <p><em>no results :(</em></p>
   {% endif %}

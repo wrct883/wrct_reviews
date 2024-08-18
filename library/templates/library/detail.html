@@ -35,21 +35,20 @@
     </button>
   </a>
   {% if object.review_set.all %}
-  {% include "library/includes/table.html" with objects=object.review_set.all fields="user review" %}
+  {% include "library/includes/table.html" with table_obj=tables.review fields="user review" %}
   {% endif %}
   {% elif table == "Label" or table == "Artist" %}
   <h1>Related Albums</h1>
-  {% if object.album_set.all %}
-  {# TODO: make this table an include #}
-  {% include "library/includes/table.html" with objects=object.album_set.all fields="album year artist" %}
-  {% else %}
-  <p>This artist doesn't have any associated albums.</p>
-  {% endif %}
   <a href="{% url 'library:create' object.table object.pk 'album' %}">
     <button class="outline mb1">
       Add an album here <b class='icon'>+</b>
     </button>
   </a>
+  {% if tables.album.objects %}
+  {% include "library/includes/table.html" with table_obj=tables.album fields="album year artist" %}
+  {% else %}
+  <p>This {{ table|lower }} doesn't have any associated albums.</p>
+  {% endif %}
   {% endif %}
 </main>
 {% endblock %}

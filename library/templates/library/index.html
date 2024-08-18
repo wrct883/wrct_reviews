@@ -31,32 +31,9 @@
       New Review <b class='icon'>+</b>
     </button>
   </a>
-  {% if reviews %}
-  {% include "library/includes/pagination.html" with page=reviews param='rpage' %}
-  {# TODO: make this table an include #}
-  <table class='list-table mt1-5 scrollable' id='rpage'>
-    <tr>
-      <th class='pointer' onclick="shuffleOrdering('date_added', 'ro', 'rpage')">
-        Date{% if ro == "-date_added" %}&#9660;{% elif ro == "date_added" %}&#9650;{% endif %}
-      </th>
-      <th class='pointer' onclick="shuffleOrdering('album', 'ro', 'rpage')">
-        Album{% if ro == "-album" %}&#9660;{% elif ro == "album" %}&#9650;{% endif %}
-      </th>
-      <th class='pointer' onclick="shuffleOrdering('user', 'ro', 'rpage')">
-        User{% if ro == "-user" %}&#9660;{% elif ro == "user" %}&#9650;{% endif %}
-      </th>
-      <th>Review</th>
-    </tr>
-    {% for review in reviews %}
-    <tr>
-      <td>{{ review.date_added|date:'Y-m-d' }}</td>
-      <td>{{ review.album|truncatechars:50 }} <a href="{% url 'library:detail' 'album' review.album.id %}">(view)</a></td>
-      <td>{{ review.user.name }}</td>
-      <td>{{ review.review|truncatechars:100 }} <a href="{% url 'library:detail' 'review' review.id %}">(view)</a></td>
-    </tr>
-    {% endfor %}
-  </table>
-  {% include "library/includes/pagination.html" with page=reviews param='rpage' %}
+  {% if tables.reviews.objects %}
+  {% include "library/includes/pagination.html" with page=tables.reviews.objects param=tables.reviews.param %}
+  {% include "library/includes/table.html" with table_obj=tables.reviews truncateRows=True class="mt1-5" %}
   {% endif %}
 </section>
 
@@ -67,46 +44,9 @@
       New Album <b class='icon'>+</b>
     </button>
   </a>
-  {% if albums %}
-  {% include "library/includes/pagination.html" with page=albums param='apage' %}
-  {# TODO: make this table an include #}
-  <table class='list-table mt1-5 scrollable' id='apage'>
-    <tr>
-      <th class='pointer' onclick="shuffleOrdering('album', 'ao', 'apage')">
-        Album{% if ao == "-album" %}&#9660;{% elif ao == "album" %}&#9650;{% endif %}
-      </th>
-      <th class='pointer' onclick="shuffleOrdering('label', 'ao', 'apage')">
-        Label{% if ao == "-label" %}&#9660;{% elif ao == "label" %}&#9650;{% endif %}
-      </th>
-      <th class='pointer' onclick="shuffleOrdering('artist', 'ao', 'apage')">
-        Arist{% if ao == "-artist" %}&#9660;{% elif ao == "artist" %}&#9650;{% endif %}
-      </th>
-      <th class='pointer' onclick="shuffleOrdering('format', 'ao', 'apage')">
-        Format{% if ao == "-format" %}&#9660;{% elif ao == "format" %}&#9650;{% endif %}
-      </th>
-      <th class='pointer' onclick="shuffleOrdering('year', 'ao', 'apage')">
-        Year{% if ao == "-year" %}&#9660;{% elif ao == "year" %}&#9650;{% endif %}
-      </th>
-      <th class='pointer' onclick="shuffleOrdering('date_added', 'ao', 'apage')">
-        Date Added{% if ao == "-date_added" %}&#9660;{% elif ao == "date_added" %}&#9650;{% endif %}
-      </th>
-      <th class='pointer' onclick="shuffleOrdering('status', 'ao', 'apage')">
-        Status{% if ao == "-status" %}&#9660;{% elif ao == "status" %}&#9650;{% endif %}
-      </th>
-    </tr>
-    {% for album in albums %}
-    <tr>
-      <td>{{ album.album|truncatechars:50 }} <a href="{% url 'library:detail' 'album' album.id %}">(view)</a></td>
-      <td>{{ album.label|truncatechars:50 }} <a href="{% url 'library:detail' 'label' album.label.id %}">(view)</a></td>
-      <td>{{ album.artist|truncatechars:50 }} <a href="{% url 'library:detail' 'artist' album.artist.id %}">(view)</a></td>
-      <td>{{ album.get_format_display }}</td>
-      <td>{{ album.year }}</td>
-      <td>{{ album.date_added|date:'Y-m-d' }}</td>
-      <td>{{ album.status }}</td>
-    </tr>
-    {% endfor %}
-  </table>
-  {% include "library/includes/pagination.html" with page=albums param='apage' %}
+  {% if tables.albums.objects %}
+  {% include "library/includes/pagination.html" with page=tables.albums.objects param=tables.albums.param %}
+  {% include "library/includes/table.html" with table_obj=tables.albums fields="album label artist format year date_added status" truncateRows=True class="mt1-5" %}
   {% endif %}
 </section>
 

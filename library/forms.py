@@ -37,6 +37,8 @@ class CustomSelectWidget(forms.Select):
         super().__init__()
 
 class LibraryCreateFormMixin(forms.ModelForm):
+    error_css_class = "error"
+
     def __init__(self, *args, **kwargs):
         related = kwargs.pop('related')
         related_obj = kwargs.pop('related_obj')
@@ -92,7 +94,6 @@ class SubgenreForm(LibraryCreateFormMixin, forms.ModelForm):
         fields = '__all__'
 
 class ReviewForm(LibraryCreateFormMixin, forms.ModelForm):
-    error_css_class = "error"
     class Meta:
         model = Review
         fields = '__all__'

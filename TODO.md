@@ -1,17 +1,9 @@
 
 TODO:
-* need a way to dynamically create tables
-    * specify fields - DONE
-    * specify which fields are sortable
-    * specify the url parameter used for sorting that table
-    * use this in detail view (related albums, related reviews) - DONE
-    * use this in list views (browse/search) - DONE
 * auth levels per users
     * permission: only admin can make another user an admin, only exec can make another user exec, etc
 * authentication via oauth
 
-* fix the "reviews this semester" thing
-* need pagination on "related albums" tables
 * make subgenres only show whatever genre is selected (need to modify genre select and subgenre widgets)
 
 * add links to listen to an album on spotify/apple music?
@@ -72,10 +64,12 @@ DONE:
 * explore bin view
 * review leaderboard view
 
+DONE:
+* dynamic, sortable, includable tables finally finished :))
+
 NEXT:
-* sortable tables
-* album art / spinitron on album page?
 * subgenre filtering (js?)
+* album art / spinitron on album page?
 
 ---
 # todo i made for chris

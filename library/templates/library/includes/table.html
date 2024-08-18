@@ -1,10 +1,15 @@
 {% load library_filters %}
-
-{% with fields=fields|parse_array %}
-<table class='list-table{% if class %} {{ class }}{% endif %}' id='{{ param }}'>
+{% with fields=fields|parse_array sortable=table_obj.sortable|parse_array param=table_obj.param objects=table_obj.objects field_orders=table_obj.field_orders %}
+{% with fields=fields|otherwise:table_obj.fields %}
+<div class='scrollable{% if class %} {{ class }}{% endif %}'>
+<table class='list-table' id='{{ param }}'>
   <tr>
   {% for field in fields %}
-    <th>{{ objects.0|verbose_name:field }}</th>
+    {% if field|in:sortable and param and objects.paginator.count > 1 %}
+    <th class='pointer' onclick="shuffleOrdering('{{ field }}', '{{ param }}')" data-field="{{ field }}">
+      {{ objects.0|verbose_name:field }}{{ field_orders|lookup:field }}
+    </th>
+    {% else %}<th>{{ objects.0|verbose_name:field }}</th>{% endif %}
   {% endfor %}
   </tr>
   {% for object in objects %}
@@ -20,5 +25,7 @@
   </tr>
   {% endfor %}
 </table>
+</div>
 {% if param %}{% include "library/includes/pagination.html" with page=objects param=param %}{% endif %}
+{% endwith %}
 {% endwith %}

@@ -13,6 +13,10 @@ def anize(word):
     else:
         return f'a {word}'
 
+@register.filter(name='otherwise')
+def otherwise(value, alternative):
+    return value if value else alternative
+
 @register.filter(name='parse_array')
 def parse_array(arr):
     if isinstance(arr, str):
@@ -28,6 +32,11 @@ def verbose_name(obj, field_name):
 
 @register.filter(name='lookup')
 def lookup(obj, field):
+    if isinstance(obj, dict):
+        return obj.get(field, "")
+    elif isinstance(obj, str):
+        return ""
+
     # TODO: I shouldn't have to do these if/else statements
     # this is so busted
     attr = getattr(obj, field)
@@ -51,3 +60,7 @@ def lookup(obj, field):
 
     string_rep = string_rep if string_rep else ''
     return mark_safe(string_rep)
+
+@register.filter(name='in')
+def filter_in(obj, arr):
+    return obj in arr
