@@ -25,7 +25,7 @@
       <li><a href="{% url 'library:list' 'album' %}"{% if listView %} class="active"{% endif %}>explore bin</a></li>
       <li><a href="{% url 'library:actions' %}"{% if actionView %} class="active"{% endif %}>action log</a></li>
       <li><a href="{% url 'library:leaderboard' %}"{% if leaderboardView %} class="active"{% endif %}>leaderboard</a></li>
-      <li><a href="#">log out</a></li>
+      <li><a href="/logout/">log out</a></li>
       <li>
         <form action="{% url 'library:search' %}" method="post">
           {% csrf_token %}

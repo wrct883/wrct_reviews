@@ -384,7 +384,7 @@ Every time we save, create a LogEntry
 """
 def post_save_handler(sender, instance, created, **kwargs):
     request = get_request()
-    if not request:
+    if not request or not request.user.is_authenticated:
         return
     # don't even make a logentry if we don't have the request
 
@@ -412,7 +412,7 @@ def post_save_handler(sender, instance, created, **kwargs):
 
 def post_delete_handler(sender, instance, **kwargs):
     request = get_request()
-    if not request:
+    if not request or not request.user.is_authenticated:
         return
     # don't even make a logentry if we don't have the request
 

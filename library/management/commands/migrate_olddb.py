@@ -135,7 +135,7 @@ def migrate_artists():
             continue
         new_artist = Artist(
                     artist=artist,
-                    short_name = short_name,
+                    short_name = short_name[:6] if short_name else None,
                     comment = comment,
                     olddb_id = olddb_id,
                 )

@@ -26,7 +26,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-lhprnbuz!kyd48edt$yp%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG_VALUE', 'True') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['reviews.wrct.org', 'db.wrct.org', 'wrct.org', ]
 
 
 # Application definition
@@ -47,8 +47,12 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'wrct_reviews.middleware.CustomHeaderMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.RemoteUserBackend",
 ]
 
 ROOT_URLCONF = 'wrct_reviews.urls'
@@ -88,7 +92,8 @@ DATABASES = {
         'NAME': os.environ.get('DB_DATABASE'),
         'USER': os.environ.get('DB_USER'),
         'PASSWORD': os.environ.get('DB_PASSWORD'),
-        'HOST': os.environ.get('DB_HOST', 'db'),  # Use 'db' as default from .env
+        'HOST': 'wrct-reviews-mariadb',
+        # fuck it, just going to hardcode this in, deploying is hard
         'PORT': os.environ.get('DB_PORT', '3306'),  # Use '3306' as default from .env
     }
 }
