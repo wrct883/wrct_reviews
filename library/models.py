@@ -19,7 +19,7 @@ DETAIL_FIELDS = {
     'Subgenre': ('genre', 'subgenre'),
     'Label': ('label', 'contact_person', 'email', 'address', 'city', 'state', 'phone', 'comment'),
     'Review': ('user', 'date_added', 'album', 'review'),
-    'User': ('username', 'first_name', 'last_name', 'djname', 'phone', 'email', 'auth_level'),
+    'User': ('username', 'first_name', 'last_name', 'djname', 'phone', 'email', 'date_trained', 'auth_level'),
 }
 SEARCH_FIELDS = {
     'Album': ['album', 'artist'],
@@ -402,7 +402,8 @@ def post_save_handler(sender, instance, created, **kwargs):
                 new_value = getattr(instance, field)
                 if getattr(old_instance, field) != getattr(instance, field):
                     changed_fields.append([field, old_value, new_value])
-    print(changed_fields)
+        if not changed_fields:
+            return
 
     LibraryEntry.create_entry(
         user = request.user,

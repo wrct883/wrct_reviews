@@ -259,7 +259,7 @@ def delete(request, table, pk):
     if ((getattr(obj, 'album_set', False) and obj.album_set.count()) or
         (getattr(obj, "review_set", False) and obj.review_set.count())):
         canDelete = False
-    canDelete |= request.user.auth_level == 'Admin'
+    canDelete |= request.user.auth_level.lower() == 'admin'
 
     #form = CREATE_FORMS[table](data = request.POST or None, related = related, related_obj = related_obj)
     if request.method == 'POST':

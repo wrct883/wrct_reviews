@@ -11,7 +11,7 @@
     {% csrf_token %}
     {% if canDelete %}
     <p>Deleting this object <em>cannot</em> be undone, except by restoring a database backup.</p>
-    {% if request.user.auth_level != "Admin" %}<p>Incorrectly deleting this {{ table }} will likely cause your ISM a lot of work. Are you sure you want to proceed?</p>
+    {% if request.user.auth_level|lower != "admin" %}<p>Incorrectly deleting this {{ table }} will likely cause your ISM a lot of work. Are you sure you want to proceed?</p>
     {% else %}<p>You're the ISM, it'll be your mess.</p>{% endif %}
     {% else %}
     <p>Becuase this {{ table }} has associated objects related to it (reviews, albums, etc), it can only be deleted by an admin. Contact your ISM!</p>
