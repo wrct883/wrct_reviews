@@ -31,7 +31,7 @@ from urllib.parse import urlencode
 
 PAGINATION_COUNT = 25
 ORDERING_SUFFIX = "_o"
-def add_table(request, table_dict, queryset, param, name=None, count=PAGINATION_COUNT):
+def add_table(request, table_dict, queryset, param, name=None, count=PAGINATION_COUNT, fields=None):
     """
     request: the WSGI request object
     table_dict: dict to add the generated, paginated/ordered queryset to
@@ -70,7 +70,7 @@ def add_table(request, table_dict, queryset, param, name=None, count=PAGINATION_
         "field_orders": field_orders,
         "param": param,
         "sortable": SORTABLE_FIELDS[table],
-        "fields": LIST_FIELDS[table],
+        "fields": fields if fields else LIST_FIELDS[table],
     }
 
 def index(request):
@@ -206,12 +206,16 @@ def list(request, table = None):
 
     # filter albums if we have album info
     isAlbumSearch = False
+    fields = [f for f in LIST_FIELDS[table]]
     if table.lower() == 'album':
         objects, isAlbumSearch = album_search(request, objects)
         if not (query or isAlbumSearch):
             objects = objects.filter(date_removed__isnull=True)
         # ^unless you're searching for an album, do not show objects that have been
         # removed from the bin
+        else:
+            fields.insert(fields.index('date_added') + 1, 'date_removed')
+        # add in date_removed to the list otherwise
 
 
     tables = {}
@@ -219,7 +223,8 @@ def list(request, table = None):
               table_dict = tables,
               queryset = objects,
               param = 'page',
-              name = "list")
+              name = "list",
+              fields = fields)
 
     """
     need to decide if we're on an AJAX view here and then return json if so

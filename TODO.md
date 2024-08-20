@@ -83,6 +83,9 @@ DONE:
     * added it to home page
 * added view links from home page as well
 
+DONE:
+* added `date_removed` to table list if you're on an advanced search or have a query
+
 ---
 # todo i made for chris
 
