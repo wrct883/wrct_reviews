@@ -216,7 +216,7 @@ def migrate_albums():
                 year=year,
                 date_added = date_added,
                 date_removed = date_removed,
-                status = status if status and len(status) <= 4 else None,
+                status = status if status and len(status) <= 7 else None,
                 olddb_id = olddb_id,
                 format = format_id,
             )

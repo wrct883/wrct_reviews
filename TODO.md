@@ -2,7 +2,6 @@
 TODO:
 * auth levels per users
     * permission: only admin can make another user an admin, only exec can make another user exec, etc
-* authentication via oauth
 
 * add autocomplete on create search
 
@@ -60,8 +59,7 @@ DONE:
 * media queries
 * "add a subgenre for this album" - editing link
 
-NEXT:
-* auth level permissions (only admin can make admin, etc)
+DONE:
 * auth
 * deploy
 
@@ -70,6 +68,20 @@ wrct db
 API key 	8c96e05d82dcc8bd73ad54b96dd26c25
 Shared secret 	2f0b39da6295da2f14793521add274a3
 Registered to 	wrct883fm
+
+# 2024-08-20
+DONE:
+* added 'missing' and 'library' statuses back to db
+* json bug fix
+* `date_added` bug fix
+* don't show items that removed from bin on the `explore bin` page, unless the user searches for them
+* added back `date_removed` if you're creating a new entry
+* advanced album search form:
+    * filter by genre
+    * filter by date added in range
+    * filter by status
+    * added it to home page
+* added view links from home page as well
 
 ---
 # todo i made for chris

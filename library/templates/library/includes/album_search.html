@@ -1,0 +1,6 @@
+<form action="{% url 'library:search' %}" method="post" class='search-form'>
+  {% csrf_token %}
+  <!--<input name='table' type='hidden' value='album'></input>-->
+  Find {{ form.genre }} albums created between {{ form.start_date}} and {{ form.end_date }} with status {{ form.status }}
+  <button class='small gray' type="submit">search</button>
+</form>

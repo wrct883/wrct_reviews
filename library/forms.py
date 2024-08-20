@@ -1,8 +1,9 @@
 from django import forms
 from django.db import models
+import datetime
 
 from .models import (
-    Album,
+    Album, STATUS_CHOICES,
     Artist,
     Label,
     Genre,
@@ -11,14 +12,31 @@ from .models import (
     User,
 )
 
+def genreChoices():
+    return [('', 'Any genre')] + [(genre.id, genre.genre) for genre in Genre.objects.all().order_by('genre')]
+
+class DateInput(forms.DateInput):
+    input_type = 'date'
+
 # TODO: make this a constant with converters and views.py
 TABLE_CHOICES = [('album', 'Albums'), ('artist', 'Artists'), ('label', 'Labels'), ('review', 'Reviews'), ('genre', 'Genres'), ('user', 'Users')]
 POS_CHOICES = [('icontains', 'include'), ('istartswith', 'start with'), ('iendswith', 'end with'), ('iexact', 'match exactly')]
 class SearchForm(forms.Form):
-    table = forms.ChoiceField(choices=TABLE_CHOICES)
-    pos = forms.ChoiceField(choices=POS_CHOICES)
+    table = forms.ChoiceField(choices=TABLE_CHOICES, required=False)
+    pos = forms.ChoiceField(choices=POS_CHOICES, required=False)
     query = forms.CharField(required=False)
 
+    # album search forms
+    start_date = forms.DateField(required=False, widget=DateInput)
+    end_date = forms.DateField(initial=datetime.date.today, required=False, widget=DateInput)
+    status = forms.ChoiceField(choices=[('', 'Any status')] + STATUS_CHOICES, required=False)
+    genre = forms.ChoiceField(choices=genreChoices, required=False)
+
+    def clean(self):
+        query = self.cleaned_data['query']
+        pos = self.cleaned_data['pos']
+        if query and not pos:
+            raise ValidationError('query provided but not pos')
 
 class CustomSelectWidget(forms.Select):
     template_name = 'library/forms/select.html'
@@ -49,7 +67,10 @@ class LibraryCreateFormMixin(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         ## custom excluded fields
-        for field_name in ['user', 'date_added', 'date_removed', 'olddb_id', 'short_name']:
+        excluded_fields = ['user', 'date_added', 'olddb_id', 'short_name']
+        if not self.instance.id: # remove date_removed if you're creating a new entry
+            excluded_fields.append('date_removed')
+        for field_name in excluded_fields:
             if field_name in self.fields:
                 self.fields.pop(field_name)
 
@@ -63,6 +84,9 @@ class LibraryCreateFormMixin(forms.ModelForm):
 
                 if field_name == 'subgenre':
                     field.widget = CustomSubgenreWidget(queryset=field._queryset)
+
+            elif isinstance(field, forms.fields.DateField):
+               field.widget = forms.widgets.DateInput(attrs={'type': 'date'})
 
 
 """

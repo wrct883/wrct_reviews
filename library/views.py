@@ -18,7 +18,7 @@ from django.contrib import messages
 from django.apps import apps
 from django.db.models import Q, Count
 from .forms import (
-    SearchForm,
+    SearchForm,# AlbumSearchForm,
     AlbumForm,
     ArtistForm,
     LabelForm,
@@ -27,6 +27,7 @@ from .forms import (
     ReviewForm,
     UserForm,
 )
+from urllib.parse import urlencode
 
 PAGINATION_COUNT = 25
 ORDERING_SUFFIX = "_o"
@@ -83,9 +84,12 @@ def index(request):
     add_table(request, tables, reviews, 'reviews', count=10)
     add_table(request, tables, albums, 'albums', count=10)
 
+    searchForm = SearchForm()
+
     context = {
         "indexView": True,
         "tables": tables,
+        "searchForm": searchForm,
     }
     return render(request, "library/index.html", context)
 
@@ -118,6 +122,33 @@ def profile(request, pk=None):
         pk = request.user.id
     return detail(request, 'User', pk)
 
+def album_search(request, albums):
+    """
+    Filter albums by query params, if present
+    """
+    start_date_str = request.GET.get('start_date')
+    end_date_str = request.GET.get('end_date')
+    genre = request.GET.get('genre')
+    status = request.GET.get('status')
+
+    is_searching = False
+
+    if start_date_str:
+        is_searching = True
+        start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date()
+        albums = albums.filter(date_added__gte=start_date)
+    if end_date_str:
+        is_searching = True
+        end_date = datetime.strptime(end_date_str, "%Y-%m-%d").date()
+        albums = albums.filter(date_added__lte=end_date)
+    if genre:
+        is_searching = True
+        albums = albums.filter(genre=genre)
+    if status:
+        is_searching = True
+        albums = albums.filter(status=status)
+    return albums, is_searching
+
 def list(request, table = None):
     """
     Produces a list of objects either from a search form, or from a url
@@ -133,11 +164,21 @@ def list(request, table = None):
         form = SearchForm(request.POST)
         if form.is_valid():
             table = form.cleaned_data.get('table')
-            pos = form.cleaned_data.get('pos')
-            query = form.cleaned_data.get('query')
+            if not table:
+                table = 'album'
+            query_params = {
+                key: form.cleaned_data.get(key) for key in form.fields.keys() if (
+                    key != 'table' and form.cleaned_data.get(key)
+                )
+            }
+            if not query_params.get('query'):
+                query_params.pop('pos', None)
+            #pos = form.cleaned_data.get('pos')
+            #query = form.cleaned_data.get('query')
+            query_params = urlencode(query_params)
             url = reverse('library:list', kwargs = {'table': table})
-            if query:
-                url += f"?pos={pos}&query={query}"
+            if query_params:
+                url += '?' + query_params
             return HttpResponseRedirect(url)
         else:
             messages.error(request, "invalid search form")
@@ -148,6 +189,7 @@ def list(request, table = None):
 
     # we are on the list page formally now
     form = SearchForm()
+    #albumForm = AlbumSearchForm() if table.lower() == 'album' else None
     ModelClass = apps.get_model(app_label='library', model_name=table)
     objects = ModelClass.objects.all()
 
@@ -161,6 +203,16 @@ def list(request, table = None):
             #isForeignKey = isinstance(ModelClass._meta.get_field('field'), ForeignKey)
             q_objects |= Q(**{f"{field}{f'__{field}' if isForeignKey else ''}__{pos}": query})
         objects = objects.filter(q_objects)
+
+    # filter albums if we have album info
+    isAlbumSearch = False
+    if table.lower() == 'album':
+        objects, isAlbumSearch = album_search(request, objects)
+        if not (query or isAlbumSearch):
+            objects = objects.filter(date_removed__isnull=True)
+        # ^unless you're searching for an album, do not show objects that have been
+        # removed from the bin
+
 
     tables = {}
     add_table(request,
@@ -186,6 +238,7 @@ def list(request, table = None):
         "table": table,
         "form": form,
         "listView": True,
+        'isAlbumSearch': isAlbumSearch,
 
         "tables": tables,
     }
@@ -227,7 +280,8 @@ def create(request, table, related=None, related_pk=None, pk=None):
         if form.is_valid():
             obj = form.save(commit=False)
             obj.user = request.user
-            obj.date_added = timezone.now().date()
+            if not obj.date_added:
+                obj.date_added = timezone.now().date()
             obj.save()
             form.save_m2m()
             verb = 'created' if not pk else 'updated'

@@ -203,6 +203,13 @@ section h1 {
   font-size: 2em;
 }
 
+.button-container {
+  margin-bottom: 1rem;
+  display: flex;
+  gap: 1rem;
+}
+.button-container button { height: 100%; }
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -371,6 +378,18 @@ main.detail {
   color: var(--light-gray);
   box-shadow: rgba(149, 157, 165, 0.2) 4px 8px 8px;
   font-size: 1.3em;
+}
+
+details > summary {
+  cursor: pointer;
+}
+details[open=""] > summary {
+  margin: -1rem;
+  margin-bottom: 1rem;
+}
+details[open=""] {
+  background: var(--light-gray);
+  padding: 1rem;
 }
 
 @media (max-width: 1640px) {

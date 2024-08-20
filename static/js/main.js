@@ -20,7 +20,6 @@ function shuffleOrdering(field, param) {
 
   // descending -> ascending -> none -> descending
 
-  console.log("start", orderingList);
   // we're currently filtering descending -> ascending
   if (orderingList.indexOf(descField) >= 0)
     orderingList[orderingList.indexOf(descField)] = field;
@@ -73,17 +72,35 @@ function setSearchForm() {
     }
   }
 
-  var pos = urlParams.get("pos");
-  var query = urlParams.get("query");
-  if (!query || !pos)
-    return;
+  function setSelect(...names) {
+    names.forEach((name) => {
+      var value = urlParams.get(name);
+      if (value) {
+        document.querySelectorAll(`select[name='${name}'] option[value='${value}']`).forEach((el) => {
+          el.selected = true;
+        });
+      }
+    });
+  }
+  function setInput(...names) {
+    names.forEach((name) => {
+      console.log(name);
+      var value = urlParams.get(name);
+      if (value) {
+        console.log('has value', value);
+        document.querySelectorAll(`input[name="${name}"]`).forEach((el) => {
+          console.log('hey!', el);
+          el.value = value;
+          el.placeholder = value;
+        });
+      }
+    });
+  }
 
-  document.querySelectorAll(`select[name='pos'] option[value='${pos}']`).forEach((el) => {
-    el.selected = true;
-  });
-  document.querySelectorAll("input[name='query']").forEach((el) => {
-    el.value = query;
-    el.placeholder = query;
-  });
+  setInput('query');
+  setSelect('pos');
+
+  setSelect('genre', 'status');
+  setInput('start_date', 'end_date');
 }
 setSearchForm();

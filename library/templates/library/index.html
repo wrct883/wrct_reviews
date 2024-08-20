@@ -26,11 +26,18 @@
 
 <section>
   <h1>Recent reviews</h1>
-  <a href="{% url 'library:create' 'review' %}">
-    <button class="outline mb1">
-      New Review <b class='icon'>+</b>
-    </button>
-  </a>
+  <div class='button-container'>
+    <a href="{% url 'library:create' 'review' %}">
+      <button class="outline">
+        New Review <b class='icon'>+</b>
+      </button>
+    </a>
+    <a href="{% url 'library:list' 'review' %}">
+      <button class="outline">
+        View all reviews
+      </button>
+    </a>
+  </div>
   {% if tables.reviews.objects %}
   {% include "library/includes/pagination.html" with page=tables.reviews.objects param=tables.reviews.param %}
   {% include "library/includes/table.html" with table_obj=tables.reviews truncateRows=True class="mt1-5" %}
@@ -39,15 +46,25 @@
 
 <section>
   <h1>Recent albums</h1>
-  <a href="{% url 'library:create' 'album' %}">
-    <button class="outline mb1">
-      New Album <b class='icon'>+</b>
-    </button>
-  </a>
+  <div class='button-container'>
+    <a href="{% url 'library:create' 'album' %}">
+      <button class="outline">
+        New Album <b class='icon'>+</b>
+      </button>
+    </a>
+    <a href="{% url 'library:list' 'album' %}">
+      <button class="outline">
+        View all albums
+      </button>
+    </a>
+  </div>
   {% if tables.albums.objects %}
   {% include "library/includes/pagination.html" with page=tables.albums.objects param=tables.albums.param %}
-  {% include "library/includes/table.html" with table_obj=tables.albums fields="album artist label format year date_added status" truncateRows=True class="mt1-5" %}
+  {% include "library/includes/table.html" with table_obj=tables.albums fields="album artist label genre year date_added status" truncateRows=True class="mt1-5" %}
   {% endif %}
+
+  <h2 class='mt1-5'>Advancted album search</h2>
+  {% include "library/includes/album_search.html" with form=searchForm %}
 </section>
 
 </main>

@@ -31,7 +31,7 @@ SEARCH_FIELDS = {
     'User': ['first_name', 'last_name', 'username', 'djname'],
 }
 LIST_FIELDS = {
-    'Album': ['album', 'artist', 'label', 'genre', 'year', 'date_added', 'date_removed', 'status', 'format'],
+    'Album': ['album', 'artist', 'label', 'genre', 'year', 'date_added', 'status', 'format'],
     'Artist': DETAIL_FIELDS['Artist'],
     'Genre': DETAIL_FIELDS['Genre'],
     'Subgenre': DETAIL_FIELDS['Subgenre'],
@@ -200,6 +200,15 @@ class Subgenre(models.Model):
     class Meta:
         ordering = ('genre', 'subgenre')
 
+STATUS_CHOICES = [
+    ("Bin", "Bin"),
+    ("N&WC", "New and Way Cool"),
+    ("NIB", "Never in bin"),
+    ("TBR", "To be reviewed"),
+    ("OOB", "Out of bin"),
+    ("Missing", "Missing"),
+    ("Library", "Library"),
+]
 class Album(models.Model):
     album = models.CharField(max_length=255, default='')
     artist = models.ForeignKey(Artist, on_delete=models.SET_NULL, null=True)
@@ -210,15 +219,7 @@ class Album(models.Model):
     date_added = models.DateField(default=date.today, null=True)
     date_removed = models.DateField(null=True, blank=True)
 
-    STATUS_CHOICES = [
-        ("Bin", "Bin"),
-        ("N&WC", "N&WC (??)"),
-        ("NIB", "Not in bin"),
-        ("TBR", "To be reviewed"),
-        ("OOB", "Out of bin"),
-    ]
-
-    status = models.CharField(max_length=4, null=True, blank=True, choices=STATUS_CHOICES)
+    status = models.CharField(max_length=7, null=True, blank=True, choices=STATUS_CHOICES)
 
     FORMAT_CHOICES = [
         (12, "LP"),
@@ -401,7 +402,7 @@ def post_save_handler(sender, instance, created, **kwargs):
                 old_value = getattr(old_instance, field)
                 new_value = getattr(instance, field)
                 if getattr(old_instance, field) != getattr(instance, field):
-                    changed_fields.append([field, old_value, new_value])
+                    changed_fields.append([field, str(old_value), str(new_value)])
         if not changed_fields:
             return
 
