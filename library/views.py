@@ -285,7 +285,7 @@ def create(request, table, related=None, related_pk=None, pk=None):
         if form.is_valid():
             obj = form.save(commit=False)
             obj.user = request.user
-            if not obj.date_added:
+            if table.lower() in ['album', 'review'] and not obj.date_added:
                 obj.date_added = timezone.now().date()
             obj.save()
             form.save_m2m()

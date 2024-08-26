@@ -265,6 +265,9 @@ h1.large {
   margin-top: -0.5rem;
   resize: vertical;
 }
+.form .grid .helptext {
+  display: none;
+}
 
 .form fieldset > div {
   display: grid;

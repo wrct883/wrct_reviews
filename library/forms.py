@@ -129,4 +129,4 @@ class ReviewForm(LibraryCreateFormMixin, forms.ModelForm):
 class UserForm(LibraryCreateFormMixin, forms.ModelForm):
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'djname', 'phone', 'email', 'auth_level')
+        fields = ('username', 'first_name', 'last_name', 'djname', 'phone', 'email', 'auth_level')
