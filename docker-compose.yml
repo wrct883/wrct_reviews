@@ -1,4 +1,3 @@
-version: '3.7'
 services:
   reviews-db:
     image: mysql:9
@@ -22,7 +21,8 @@ services:
       - ./.env
     depends_on:
       - reviews-db
-
+    ports:
+      - '8001:8001'
 networks:
   default:
       name: wrct-dockernet
