@@ -264,7 +264,12 @@ class Review(models.Model):
     user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
     date_added = models.DateTimeField(default=timezone.now)
     album = models.ForeignKey(Album, on_delete=models.SET_NULL, null=True)
+    artist = models.ForeignKey(Artist, on_delete=models.SET_NULL, null=True)
+    label = models.CharField(max_length=255, default='')
+    genre = models.ForeignKey(Genre, on_delete = models.SET_NULL, null=True)
     review = models.TextField(default='')
+    riyl = models.TextField(default='')
+    nfap = models.TextField(default='')
     olddb_id = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
