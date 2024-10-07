@@ -26,7 +26,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-lhprnbuz!kyd48edt$yp%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG_VALUE', 'True') == 'True'
 
-ALLOWED_HOSTS = ['reviews.wrct.org', 'db.wrct.org', 'wrct.org', '127.0.0.1', '0.0.0.0']
+ALLOWED_HOSTS = ['reviews.wrct.org', 'db.wrct.org', 'wrct.org']
 
 CSRF_TRUSTED_ORIGINS = ['https://' + host for host in ALLOWED_HOSTS]
 
@@ -49,13 +49,13 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-#    'wrct_reviews.middleware.CustomHeaderMiddleware',
+    'wrct_reviews.middleware.CustomHeaderMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-#AUTHENTICATION_BACKENDS = [
-#    "django.contrib.auth.backends.RemoteUserBackend",
-#]
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.RemoteUserBackend",
+]
 ROOT_URLCONF = 'wrct_reviews.urls'
 
 TEMPLATES = [
