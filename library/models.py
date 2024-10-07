@@ -268,7 +268,7 @@ class Review(models.Model):
     label = models.CharField(max_length=255, default='')
     genre = models.ForeignKey(Genre, on_delete = models.SET_NULL, null=True)
     review = models.TextField(default='')
-    riyl = models.TextField(default='')
+    riyl = models.TextField(blank=True, null=True)
     nfap = models.CharField(max_length=255, default='')
     olddb_id = models.IntegerField(null=True, blank=True)
 
