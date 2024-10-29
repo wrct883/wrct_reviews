@@ -22,7 +22,7 @@
   <nav>
     <ul>
       <li><a href="{% url 'library:index' %}"{% if indexView %} class="active"{% endif %}>home</a></li>
-      <li><a href="{% url 'library:list' 'album' %}"{% if listView %} class="active"{% endif %}>explore bin</a></li>
+      <li><a href="{% url 'library:list' 'album' %}"{% if listView %} class="active"{% endif %}>explore db</a></li>
       <li><a href="{% url 'library:actions' %}"{% if actionView %} class="active"{% endif %}>action log</a></li>
       <li><a href="{% url 'library:leaderboard' %}"{% if leaderboardView %} class="active"{% endif %}>leaderboard</a></li>
       <li><a href="/logout/">log out</a></li>

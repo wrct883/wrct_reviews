@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load static %}
+{% load library_filters %}
+{% block title %}wrct database : bulk modify{% endblock %}
+
+{% block content %}
+<main>
+  <h1 class='large'>bulk modify <i>{{ count }}</i> {{ table }}s</h1>
+  <a href='{% url "library:list" table|lower %}'>&#8592; back to {{ table }}s</a>
+  <p>In the form below, if you modify <i>any</i> of the fields, you will change the value for <i>all</i> currently selected albums. If you leave a field blank, then no changes will be made.</p>
+  <h2>Selected albums:</h2>
+  <ul class='repeat-cols'>
+    {% for album in albums|slice:":50"%}
+    <li>{{ album }}</li>
+    {% endfor %}
+    {% if albums.count > 50 %}
+    <li><i>...and more</i></li>
+    {% endif %}
+  </ul>
+
+  <form class='form mt1-5' method="post" id='modifyForm'>
+    {% csrf_token %}
+    <div class="grid">
+      {{ form }}
+    </div>
+    <button type="submit" class="outline mt1-5" name='bulk-modify'>modify all {{ count }} selected {{ table }}s</button>
+  </form>
+  <h2>Delete</h2>
+  <form class='form' method='post' id='deleteForm'>
+    {% csrf_token %}
+    <input type="hidden" name="delete" value="delete">
+    <button type="submit" class="outline delete" name='delete'>delete all {{ count }} selected {{ table }}s</button>
+  </form>
+</main>
+
+<script>
+const deleteForm = document.querySelector('#deleteForm');
+const modifyForm = document.querySelector('#modifyForm');
+deleteForm.addEventListener('submit', function (event) {
+  event.preventDefault();
+  const confirmed = confirm('Are you sure you want to continue deleting?');
+  if (confirmed) {
+      deleteForm.submit();
+  }
+});
+
+{% if count > 25 %}
+modifyForm.addEventListener('submit', function (event) {
+  event.preventDefault();
+  const confirmed = confirm('Are you sure you want to continue with modifying {{ count }} albums?');
+  if (confirmed) {
+      modifyForm.submit();
+  }
+});
+{% endif %}
+</script>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" src="{% static 'js/create.js' %}"></script>
+{% endblock %}

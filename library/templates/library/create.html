@@ -5,6 +5,7 @@
 
 {% block content %}
 <main>
+  {# if there's no object then show create links for other tables #}
   {% if not object %}{% with tables="album artist genre label review user"|parse_array %}
   <div class="list-links">
     {% for ftable in tables %}<span><a href="{% url 'library:create' ftable %}"{% if ftable == table|lower %} class="active"{% endif %}>{{ ftable|capfirst }}</a> </span> {% endfor %}

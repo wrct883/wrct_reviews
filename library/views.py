@@ -26,6 +26,8 @@ from .forms import (
     SubgenreForm,
     ReviewForm,
     UserForm,
+    BulkModifyAlbumForm,
+    BulkModifyListForm,
 )
 from urllib.parse import urlencode
 
@@ -38,6 +40,14 @@ def add_table(request, table_dict, queryset, param, name=None, count=PAGINATION_
     queryset: the queryset/collection of objects to paginate/order
     param: the page parameter for the table (page, albums, etc)
     name: optional, the name to call in the template to access this table
+
+    returns: a dictionary with key "name", and values
+    * objects -> the table paginator
+    * field_orders -> a dictionary  of the field and its sort direction (up arrow/down arrow)
+    * param -> the page parameter for the table
+    * sortable -> the list of sortable fields
+    * fields -> the list of fields that should be displayed in the table
+    * count -> the total number of objects in the paginator
     """
     name = name if name else param
     table = queryset.model.__name__
@@ -71,6 +81,7 @@ def add_table(request, table_dict, queryset, param, name=None, count=PAGINATION_
         "param": param,
         "sortable": SORTABLE_FIELDS[table],
         "fields": fields if fields else LIST_FIELDS[table],
+        'count': queryset.count(),
     }
 
 def index(request):
@@ -122,33 +133,6 @@ def profile(request, pk=None):
         pk = request.user.id
     return detail(request, 'User', pk)
 
-def album_search(request, albums):
-    """
-    Filter albums by query params, if present
-    """
-    start_date_str = request.GET.get('start_date')
-    end_date_str = request.GET.get('end_date')
-    genre = request.GET.get('genre')
-    status = request.GET.get('status')
-
-    is_searching = False
-
-    if start_date_str:
-        is_searching = True
-        start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date()
-        albums = albums.filter(date_added__gte=start_date)
-    if end_date_str:
-        is_searching = True
-        end_date = datetime.strptime(end_date_str, "%Y-%m-%d").date()
-        albums = albums.filter(date_added__lte=end_date)
-    if genre:
-        is_searching = True
-        albums = albums.filter(genre=genre)
-    if status:
-        is_searching = True
-        albums = albums.filter(status=status)
-    return albums, is_searching
-
 def list(request, table = None):
     """
     Produces a list of objects either from a search form, or from a url
@@ -188,27 +172,16 @@ def list(request, table = None):
         return HttpResponseRedirect(reverse('library:index'))
 
     # we are on the list page formally now
-    form = SearchForm()
-    #albumForm = AlbumSearchForm() if table.lower() == 'album' else None
-    ModelClass = apps.get_model(app_label='library', model_name=table)
-    objects = ModelClass.objects.all()
+    form = SearchForm(request.GET)
+    if not form.is_valid():
+        messages.error(request, 'invalid search search form')
+        return HttpResponseRedirect(reverse('library:index'))
 
-    # filter objects if we have a query
-    query = request.GET.get('query')
-    pos = request.GET.get('pos')
-    if query:
-        q_objects = Q()  # Initialize an empty Q object
-        for field in SEARCH_FIELDS[table]:
-            isForeignKey = ModelClass._meta.get_field(field).get_internal_type() == 'ForeignKey'
-            #isForeignKey = isinstance(ModelClass._meta.get_field('field'), ForeignKey)
-            q_objects |= Q(**{f"{field}{f'__{field}' if isForeignKey else ''}__{pos}": query})
-        objects = objects.filter(q_objects)
-
-    # filter albums if we have album info
-    isAlbumSearch = False
+    # filter objects using the search form
+    objects = form.search(table)
+    isAlbumSearch = form.isAlbumSearch
     fields = [f for f in LIST_FIELDS[table]]
     if table.lower() == 'album':
-        objects, isAlbumSearch = album_search(request, objects)
         if not (query or isAlbumSearch):
             objects = objects.filter(date_removed__isnull=True)
         # ^unless you're searching for an album, do not show objects that have been
@@ -217,6 +190,8 @@ def list(request, table = None):
             fields.insert(fields.index('date_added') + 1, 'date_removed')
         # add in date_removed to the list otherwise
 
+
+    request.session['search_form_data'] = form.data
 
     tables = {}
     add_table(request,
@@ -338,6 +313,76 @@ def delete(request, table, pk):
     }
     return render(request, 'library/delete.html', context)
 
+'''
+Bulk modify is currently only supported for albums
+I have no idea why you want to have bulk modification for anything execpt for albums
+But like, if you do, then I leave generalizing this code as an exercise for the reader
+'''
+@login_required
+def bulk_modify(request):
+    def get_albums():
+        album_data = request.session.get('bulk_modify_data')
+        search_data = request.session.get('search_form_data')
+        if not album_data:
+            messages.error(request, 'invalid session')
+            return HttpResponseRedirect(reverse('library:list', kwargs={"table": table}))
+        listForm = BulkModifyListForm(album_data)
+        return listForm.get_albums(search_data)
+
+    table = 'album'
+    if not request.user.canBulkModify:
+        messages.error(request, "you do not have permission to perform this action")
+        return HttpResponseRedirect(reverse('library:list', kwargs={"table": table}))
+    albums = Album.objects.none()
+    print('top', request.method)
+    if ((request.method == "POST" and 'bulk-modify-list' in request.POST) or
+        (request.method == "GET" and request.session.get('bulk_modify_data'))):
+        data = request.POST if request.method == "POST" else request.session.get('bulk_modify_data')
+        listForm = BulkModifyListForm(request.POST)
+        if not listForm.is_valid():
+            messages.error(request, "your selection was invalid (???)")
+            return HttpResponseRedirect(reverse('library:list', kwargs={"table": table}))
+        search_data = request.session.get('search_form_data')
+        albums = listForm.get_albums(search_data)
+        form = BulkModifyAlbumForm()
+        request.session['bulk_modify_data'] = listForm.cleaned_data
+    elif request.method == "POST":
+        print('foo', request.POST)
+        if 'bulk-modify' in request.POST:
+            albums = get_albums()
+            form = BulkModifyAlbumForm(request.POST)
+            if form.is_valid():
+                ## successfully submitted form, now we're ready to update data
+                non_empty_fields = {key: value for key, value in form.cleaned_data.items() if value}
+                for album in albums:
+                    for key, value in non_empty_fields.items():
+                        setattr(album, key, value)
+                    album.save()
+                messages.success(request, "successfully modified albums")
+            else:
+                messages.error(request, 'invalid form fields')
+                return HttpResponseRedirect(reverse('library:bulk_modify'))
+        if 'delete' in request.POST:
+            albums = get_albums()
+            if albums.count() > 5000:
+                messages.error(request, "this website won't let you delete > 5000 albums at once in one go, bc otherwise that's probably a mistake...")
+                return HttpResponseRedirect(reverse('library:bulk_modify'))
+            else:
+                albums.delete()
+                messages.success(request, "successfully deleted albums")
+        return HttpResponseRedirect(reverse('library:list', kwargs={"table": table}))
+
+    else:
+        messages.error(request, "invalid session, are you supposed to be editing this right now?")
+        return HttpResponseRedirect(reverse('library:list', kwargs={"table": table}))
+    context = {
+        'table': table,
+        'form': form,
+        'listForm': listForm,
+        'albums': albums,
+        'count': albums.count(),
+    }
+    return render(request, 'library/bulk_modify.html', context)
 
 
 class ActionListView(generic.list.ListView):

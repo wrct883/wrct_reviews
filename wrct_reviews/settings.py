@@ -26,7 +26,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-lhprnbuz!kyd48edt$yp%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG_VALUE', 'True') == 'True'
 
-ALLOWED_HOSTS = ['reviews.wrct.org', 'db.wrct.org', 'wrct.org']
+ALLOWED_HOSTS = ['reviews.wrct.org', 'db.wrct.org', 'wrct.org', '127.0.0.1']
 
 CSRF_TRUSTED_ORIGINS = ['https://' + host for host in ALLOWED_HOSTS]
 
@@ -56,6 +56,7 @@ MIDDLEWARE = [
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.RemoteUserBackend",
 ]
+
 ROOT_URLCONF = 'wrct_reviews.urls'
 
 TEMPLATES = [
@@ -79,8 +80,8 @@ WSGI_APPLICATION = 'wrct_reviews.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-'''
-DATABASES = {
+
+'''DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',

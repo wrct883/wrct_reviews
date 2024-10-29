@@ -1,6 +1,7 @@
 from django import forms
 from django.db import models
-import datetime
+from datetime import datetime, timedelta, date
+import json
 
 from .models import (
     Album, STATUS_CHOICES,
@@ -10,7 +11,12 @@ from .models import (
     Subgenre,
     Review,
     User,
+    SEARCH_FIELDS,
 )
+
+from django.apps import apps
+from django.db.models import Q
+
 
 def genreChoices():
     return [('', 'Any genre')] + [(genre.id, genre.genre) for genre in Genre.objects.all().order_by('genre')]
@@ -28,7 +34,7 @@ class SearchForm(forms.Form):
 
     # album search forms
     start_date = forms.DateField(required=False, widget=DateInput)
-    end_date = forms.DateField(initial=datetime.date.today, required=False, widget=DateInput)
+    end_date = forms.DateField(initial=date.today, required=False, widget=DateInput)
     status = forms.ChoiceField(choices=[('', 'Any status')] + STATUS_CHOICES, required=False)
     genre = forms.ChoiceField(choices=genreChoices, required=False)
 
@@ -37,6 +43,47 @@ class SearchForm(forms.Form):
         pos = self.cleaned_data['pos']
         if query and not pos:
             raise ValidationError('query provided but not pos')
+
+    def search(self, table):
+        valid = self.is_valid()
+
+        ModelClass = apps.get_model(app_label='library', model_name=table)
+        objects = ModelClass.objects.all()
+
+        # filter objects if we have a query
+        query = self.cleaned_data['query']
+        pos = self.cleaned_data['pos']
+        if query:
+            q_objects = Q()  # Initialize an empty Q object
+            for field in SEARCH_FIELDS[table]:
+                isForeignKey = ModelClass._meta.get_field(field).get_internal_type() == 'ForeignKey'
+                #isForeignKey = isinstance(ModelClass._meta.get_field('field'), ForeignKey)
+                q_objects |= Q(**{f"{field}{f'__{field}' if isForeignKey else ''}__{pos}": query})
+            objects = objects.filter(q_objects)
+
+        start_date = self.cleaned_data.get('start_date')
+        end_date = self.cleaned_data.get('end_date')
+        genre = self.cleaned_data.get('genre')
+        status = self.cleaned_data.get('status')
+
+        if start_date:
+            objects = objects.filter(date_added__gte=start_date)
+        if end_date:
+            objects = objects.filter(date_added__lte=end_date)
+        if genre:
+            objects = objects.filter(genre=genre)
+        if status:
+            objects = objects.filter(status=status)
+        return objects
+
+    def isAlbumSearch(self):
+        start_date_str = self.cleaned_data.get('start_date')
+        end_date_str = self.cleaned_data.get('end_date')
+        genre = self.cleaned_data.get('genre')
+        status = self.cleaned_data.get('status')
+
+        return bool(start_date_str or end_date_str or genre or status)
+
 
 class CustomSelectWidget(forms.Select):
     template_name = 'library/forms/select.html'
@@ -62,8 +109,8 @@ class LibraryCreateFormMixin(forms.ModelForm):
     error_css_class = "error no-contents"
 
     def __init__(self, *args, **kwargs):
-        related = kwargs.pop('related')
-        related_obj = kwargs.pop('related_obj')
+        related = kwargs.pop('related', None)
+        related_obj = kwargs.pop('related_obj', None)
         super().__init__(*args, **kwargs)
 
         ## custom excluded fields
@@ -130,3 +177,73 @@ class UserForm(LibraryCreateFormMixin, forms.ModelForm):
     class Meta:
         model = User
         fields = ('username', 'first_name', 'last_name', 'djname', 'phone', 'email', 'auth_level')
+
+class BulkModifyAlbumForm(LibraryCreateFormMixin, forms.ModelForm):
+    class Meta:
+        model = Album
+        exclude = ('album',)
+        widgets = {
+            "subgenre": forms.CheckboxSelectMultiple,
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for field in self.fields.values():
+            field.required = False
+
+
+def clean_list(value):
+    if isinstance(value, list):
+        try:
+            return [int(v) for v in value]
+        except:
+            raise forms.ValidationError(f'invalid entry for list, not all integers')
+    try:
+        #value = [Album.objects.get(pk=albumId) for albumId in json.loads(value)]
+        value = json.loads(value)
+        return value
+    except:
+        raise forms.ValidationError(f'invalid entry for list, cannot read json')
+
+'''
+I will admit that this is bad coding practice, I'm kind of just outsourcing a function to a form, and then not really using the form, but it does the job
+
+the job: given the information selectAll, selected (album id array), excluded (album id array), return a list of albums that the bulk modify form should process
+'''
+class BulkModifyListForm(forms.Form):
+    selectAll = forms.BooleanField(required=False)
+    selected = forms.ModelMultipleChoiceField(
+        queryset=Album.objects.all(),
+    )
+    excluded = forms.ModelMultipleChoiceField(
+        queryset=Album.objects.all(),
+    )
+
+    def is_valid(self):
+        valid = super().is_valid()
+        return True
+
+    def clean(self):
+        cleaned_data = super().clean()
+        selected = self.data.get('selected', '[]')
+        excluded = self.data.get('excluded', '[]')
+
+        cleaned_data['selected'] = clean_list(selected)
+        cleaned_data['excluded'] = clean_list(excluded)
+        self.cleaned_data = cleaned_data
+
+        return cleaned_data
+
+    def get_albums(self, search_data):
+        valid = self.is_valid()
+        self.clean()
+        albums = Album.objects.all()
+        if search_data:
+            form = SearchForm(search_data)
+            albums = form.search('Album')
+        if self.cleaned_data['selectAll']:
+            albums = albums.exclude(pk__in=self.cleaned_data['excluded'])
+        else:
+            albums = albums.filter(pk__in=self.cleaned_data['selected'])
+        return albums

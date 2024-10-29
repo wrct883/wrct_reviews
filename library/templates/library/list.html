@@ -27,7 +27,13 @@
   <details class='mt1-5'{% if isAlbumSearch %} open=""{% endif %}>
       <summary>Advanced album search</summary>
     {% include "library/includes/album_search.html" with form=form %}
-    </details>
+  </details>
+  {% if user.canBulkModify %}
+  <div>
+  <input type="checkbox" id="select-all" name="select-all" />
+  <button class='small gray mt1-5'><label for="select-all">select all</label></button>
+  </div>
+  {% endif %}
   {% endif %}
 
   {% if tables.list.objects %}
@@ -40,4 +46,11 @@
 
 {% block scripts %}
 <script type="text/javascript" src="{% static 'js/list.js' %}"></script>
+{% if user.canBulkModify %}
+<script>
+  const totalCount = {{ tables.list.count }};
+  const token = '{% csrf_token %}';
+</script>
+<script type="text/javascript" src="{% static 'js/bulk_modify.js' %}"></script>
+{% endif %}
 {% endblock %}

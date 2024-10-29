@@ -14,6 +14,7 @@ urlpatterns = [
     path("<table:table>", views.list, name="list"),
     path("<table:table>s", views.list, name="list"),
     path("<table:table>/create", views.create, name="create"),
+    path("album/bulk_modify", views.bulk_modify, name="bulk_modify"),
     path("<table:related>/<int:related_pk>/create/<table:table>", views.create, name="create"),
     path("<table:table>/<int:pk>/delete", views.delete, name="delete"),
     path("<table:table>/<int:pk>/update", views.create, name="update"),

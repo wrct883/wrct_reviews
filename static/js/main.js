@@ -84,12 +84,9 @@ function setSearchForm() {
   }
   function setInput(...names) {
     names.forEach((name) => {
-      console.log(name);
       var value = urlParams.get(name);
       if (value) {
-        console.log('has value', value);
         document.querySelectorAll(`input[name="${name}"]`).forEach((el) => {
-          console.log('hey!', el);
           el.value = value;
           el.placeholder = value;
         });
@@ -100,7 +97,8 @@ function setSearchForm() {
   setInput('query');
   setSelect('pos');
 
-  setSelect('genre', 'status');
-  setInput('start_date', 'end_date');
+  // not necessary if i have SearchForm(request.GET) now
+  //setSelect('genre', 'status');
+  //setInput('start_date', 'end_date');
 }
 setSearchForm();

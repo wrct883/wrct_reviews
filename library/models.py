@@ -102,6 +102,10 @@ class User(AbstractUser):
         return name.strip()
 
     @property
+    def canBulkModify(self):
+        return self.auth_level.lower() in ['exec', 'admin']
+
+    @property
     def table(self):
         return "user"
 
@@ -264,12 +268,11 @@ class Review(models.Model):
     user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
     date_added = models.DateTimeField(default=timezone.now)
     album = models.ForeignKey(Album, on_delete=models.SET_NULL, null=True)
-    artist = models.ForeignKey(Artist, on_delete=models.SET_NULL, null=True)
-    label = models.CharField(max_length=255, default='')
-    genre = models.ForeignKey(Genre, on_delete = models.SET_NULL, null=True)
     review = models.TextField(default='')
-    riyl = models.TextField(blank=True, null=True)
-    nfap = models.CharField(max_length=255, default='')
+    riyl = models.TextField('RIYL', blank=True, null=True)
+    nfap = models.CharField(max_length=255, null=True, blank=False)
+    instrumental = models.TextField('instrumental tracks', blank=True, null=True)
+    recommended = models.TextField('recommended tracks', blank=True, null=True)
     olddb_id = models.IntegerField(null=True, blank=True)
 
     def __str__(self):

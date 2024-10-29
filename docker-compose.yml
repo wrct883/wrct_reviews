@@ -21,8 +21,6 @@ services:
       - ./.env
     depends_on:
       - reviews-db
-    ports:
-      - '8001:8001'
 networks:
   default:
       name: wrct-dockernet
