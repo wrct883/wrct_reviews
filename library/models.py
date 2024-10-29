@@ -271,8 +271,8 @@ class Review(models.Model):
     review = models.TextField(default='')
     riyl = models.TextField('RIYL', blank=True, null=True)
     nfap = models.CharField(max_length=255, null=True, blank=False)
-    instrumental = models.TextField('instrumental tracks', blank=True, null=True)
-    recommended = models.TextField('recommended tracks', blank=True, null=True)
+    #instrumental = models.TextField('instrumental tracks', blank=True, null=True)
+    #recommended = models.TextField('recommended tracks', blank=True, null=True)
     olddb_id = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
