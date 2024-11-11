@@ -252,6 +252,21 @@ class Album(models.Model):
     def get_absolute_url(self):
         return reverse('library:detail', kwargs = {'table': 'album', 'pk': self.pk})
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Store the initial value of status
+        self._initial_status = self.status
+
+    def save(self, *args, **kwargs):
+        # Check if the original_field has changed
+        if self._initial_status != "OOB" and self.status == "OOB":
+            self.date_removed = date.today()
+        elif self._initial_status != "Bin" and self.status == "Bin":
+            if self.date_added is None:
+                self.date_added = date.today()
+        # Now call the superclass's save to save everything
+        super().save(*args, **kwargs)
+
     @property
     def table(self):
         return "album"

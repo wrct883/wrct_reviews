@@ -313,6 +313,25 @@ def delete(request, table, pk):
     }
     return render(request, 'library/delete.html', context)
 
+
+'''
+Return a dictionary of fields and their respective values
+Asser that all albums in `albums` have the same value for these fields
+'''
+def get_shared_fields(albums):
+    values = albums.values()
+    shared_values = values[0]
+    distinct_keys = set()
+    for v in values:
+        for key, value in v.items():
+            if key in distinct_keys:
+                continue
+            if shared_values.get(key) != value:
+                shared_values.pop(key)
+                distinct_keys.add(key)
+    if shared_values.get('genre_id'):
+        shared_values['genre'] = shared_values.pop('genre_id')
+    return shared_values
 '''
 Bulk modify is currently only supported for albums
 I have no idea why you want to have bulk modification for anything execpt for albums
@@ -334,7 +353,11 @@ def bulk_modify(request):
         messages.error(request, "you do not have permission to perform this action")
         return HttpResponseRedirect(reverse('library:list', kwargs={"table": table}))
     albums = Album.objects.none()
-    print('top', request.method)
+    '''
+    If you're making a post request, coming from the search view
+    Or if you're makinga  get request, coming from the search view
+    display the form to modify the albums
+    '''
     if ((request.method == "POST" and 'bulk-modify-list' in request.POST) or
         (request.method == "GET" and request.session.get('bulk_modify_data'))):
         data = request.POST if request.method == "POST" else request.session.get('bulk_modify_data')
@@ -344,24 +367,44 @@ def bulk_modify(request):
             return HttpResponseRedirect(reverse('library:list', kwargs={"table": table}))
         search_data = request.session.get('search_form_data')
         albums = listForm.get_albums(search_data)
-        form = BulkModifyAlbumForm()
+        '''
+        set the form to show fields that have the same value
+        '''
+        shared_fields = get_shared_fields(albums)
+
+        form = BulkModifyAlbumForm(initial=shared_fields)
         request.session['bulk_modify_data'] = listForm.cleaned_data
     elif request.method == "POST":
-        print('foo', request.POST)
+        '''
+        If you're making a POST request to modify the albums...
+        '''
         if 'bulk-modify' in request.POST:
             albums = get_albums()
+            shared_fields = get_shared_fields(albums)
             form = BulkModifyAlbumForm(request.POST)
             if form.is_valid():
                 ## successfully submitted form, now we're ready to update data
                 non_empty_fields = {key: value for key, value in form.cleaned_data.items() if value}
-                for album in albums:
-                    for key, value in non_empty_fields.items():
-                        setattr(album, key, value)
-                    album.save()
+                ## remove all entries form non_emtpy_fields that have the same value as a shared_field
+                for key, value in shared_fields.items():
+                    if non_empty_fields.get(key) == value:
+                        non_empty_fields.pop(key, None)
+
+                ## update remaining values in albums
+                ## if an album was in the bin, but is now OOB, update that...
+                if non_empty_fields:
+                    for album in albums:
+                        original_status = album.status
+                        for key, value in non_empty_fields.items():
+                            setattr(album, key, value)
+                        album.save()
                 messages.success(request, "successfully modified albums")
             else:
                 messages.error(request, 'invalid form fields')
                 return HttpResponseRedirect(reverse('library:bulk_modify'))
+        '''
+        If you're making a POST request to delete the albums...
+        '''
         if 'delete' in request.POST:
             albums = get_albums()
             if albums.count() > 5000:
