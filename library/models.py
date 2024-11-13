@@ -264,7 +264,8 @@ class Album(models.Model):
 
     def save(self, *args, **kwargs):
         # Check if the original_field has changed
-        if self._initial_status != "OOB" and self.status == "OOB":
+        if ((self._initial_status != "NIB" and self.status == "NIB") or
+            (self._initial_status != "OOB" and self.status == "OOB")):
             self.date_removed = date.today()
         elif self._initial_status != "Bin" and self.status == "Bin":
             if self.date_added is None:
