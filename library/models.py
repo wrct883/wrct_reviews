@@ -18,7 +18,7 @@ DETAIL_FIELDS = {
     'Genre': ('genre',),
     'Subgenre': ('genre', 'subgenre'),
     'Label': ('label', 'contact_person', 'email', 'address', 'city', 'state', 'phone', 'comment'),
-    'Review': ('user', 'date_added', 'album', 'review'),
+    'Review': ('user', 'date_added', 'album', 'review', 'riyl', 'nfap'),
     'User': ('username', 'first_name', 'last_name', 'djname', 'phone', 'email', 'date_trained', 'auth_level'),
 }
 SEARCH_FIELDS = {
@@ -111,6 +111,11 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.name
+
+    @property
+    def json(self):
+        return {"name": str(self),
+                "id": self.id}
 
 class Artist(models.Model):
     artist = models.CharField(max_length=255, default='')

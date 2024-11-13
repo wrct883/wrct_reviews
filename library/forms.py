@@ -111,12 +111,15 @@ class LibraryCreateFormMixin(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         related = kwargs.pop('related', None)
         related_obj = kwargs.pop('related_obj', None)
+        user = kwargs.pop('user', None)
+        included_fields = kwargs.pop('included_fields', [])
         super().__init__(*args, **kwargs)
 
         ## custom excluded fields
-        excluded_fields = ['user', 'date_added', 'olddb_id', 'short_name']
+        excluded_fields = set(['user', 'date_added', 'olddb_id', 'short_name'])
         if not self.instance.id: # remove date_removed if you're creating a new entry
-            excluded_fields.append('date_removed')
+            excluded_fields.add('date_removed')
+        [excluded_fields.remove(field_name) for field_name in included_fields if field_name in excluded_fields]
         for field_name in excluded_fields:
             if field_name in self.fields:
                 self.fields.pop(field_name)
@@ -127,10 +130,15 @@ class LibraryCreateFormMixin(forms.ModelForm):
                 field_obj = self._meta.model._meta.get_field(field_name)
                 if isinstance(field_obj, models.ForeignKey) and field._queryset.count() > 100:
                     selected = related_obj if related and related.lower() == field_name else None
+                    if field_name == 'user' and user and not self.instance.user:
+                        self.instance.user = user
                     field.widget = CustomSelectWidget(field_name, selected=selected, instance=self.instance)
 
                 if field_name == 'subgenre':
                     field.widget = CustomSubgenreWidget(queryset=field._queryset)
+
+                if field_name == 'user' and user:
+                    field.initial = user.id
 
             elif isinstance(field, forms.fields.DateField):
                field.widget = forms.widgets.DateInput(attrs={'type': 'date'})
@@ -172,6 +180,16 @@ class ReviewForm(LibraryCreateFormMixin, forms.ModelForm):
     class Meta:
         model = Review
         fields = '__all__'
+
+    '''
+    Exec can change the user for someone's review
+    Useful for Internal Music
+    '''
+    def __init__(self, *args, **kwargs):
+        user = kwargs.get('user', None)
+        if user and user.canBulkModify:
+            kwargs['included_fields'] = ['user']
+        super().__init__(*args, **kwargs)
 
 class UserForm(LibraryCreateFormMixin, forms.ModelForm):
     class Meta:

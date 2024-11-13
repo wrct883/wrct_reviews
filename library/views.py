@@ -255,11 +255,12 @@ def create(request, table, related=None, related_pk=None, pk=None):
         obj = get_object_or_404(ModelClass, pk=pk)
 
 
-    form = CREATE_FORMS[table](data = request.POST or None, related=related, related_obj=related_obj, instance=obj)
+    form = CREATE_FORMS[table](data = request.POST or None, related=related, related_obj=related_obj, instance=obj, user=request.user)
     if request.method == 'POST':
         if form.is_valid():
             obj = form.save(commit=False)
-            obj.user = request.user
+            if getattr(obj, 'user', None) is None:
+                obj.user = request.user
             if table.lower() in ['album', 'review'] and not obj.date_added:
                 obj.date_added = timezone.now().date()
             obj.save()
