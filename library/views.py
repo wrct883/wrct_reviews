@@ -379,6 +379,7 @@ def bulk_modify(request):
         '''
         If you're making a POST request to modify the albums...
         '''
+        print(request.POST)
         if 'bulk-modify' in request.POST:
             albums = get_albums()
             shared_fields = get_shared_fields(albums)
@@ -397,7 +398,11 @@ def bulk_modify(request):
                     for album in albums:
                         original_status = album.status
                         for key, value in non_empty_fields.items():
-                            setattr(album, key, value)
+                            if key == 'subgenre':
+                                album.subgenre.clear()
+                                album.subgenre.set(value)
+                            else:
+                                setattr(album, key, value)
                         album.save()
                 messages.success(request, "successfully modified albums")
             else:
