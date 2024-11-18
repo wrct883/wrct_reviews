@@ -41,11 +41,6 @@ deleteForm.addEventListener('submit', function (event) {
   event.preventDefault();
   const confirmed = confirm('Are you sure you want to continue deleting?');
   if (confirmed) {
-      const hiddenField = document.createElement('input');
-      hiddenField.type = 'hidden';
-      hiddenField.name = 'delete';
-      hiddenField.value = '';
-      modifyForm.appendChild(hiddenField);
       deleteForm.submit();
   }
 });
@@ -55,11 +50,6 @@ modifyForm.addEventListener('submit', function (event) {
   event.preventDefault();
   const confirmed = confirm('Are you sure you want to continue with modifying {{ count }} albums?');
   if (confirmed) {
-      const hiddenField = document.createElement('input');
-      hiddenField.type = 'hidden';
-      hiddenField.name = 'bulk-modify';
-      hiddenField.value = '';
-      modifyForm.appendChild(hiddenField);
       modifyForm.submit();
   }
 });

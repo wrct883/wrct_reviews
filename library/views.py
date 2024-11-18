@@ -398,7 +398,7 @@ def bulk_modify(request):
                     for album in albums:
                         original_status = album.status
                         for key, value in non_empty_fields.items():
-                            if key == 'subgenre':
+                            if key == 'subgenre': # set m2m manually
                                 album.subgenre.clear()
                                 album.subgenre.set(value)
                             else:
