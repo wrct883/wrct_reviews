@@ -18,7 +18,7 @@ DETAIL_FIELDS = {
     'Genre': ('genre',),
     'Subgenre': ('genre', 'subgenre'),
     'Label': ('label', 'contact_person', 'email', 'address', 'city', 'state', 'phone', 'comment'),
-    'Review': ('user', 'date_added', 'album', 'review', 'riyl', 'recommended', 'instrumental', 'nfap'),
+    'Review': ('user', 'date_added', 'album', 'review', 'nfap', 'riyl', 'recommended', 'instrumental'),
     'User': ('username', 'first_name', 'last_name', 'djname', 'phone', 'email', 'date_trained', 'auth_level'),
 }
 SEARCH_FIELDS = {
@@ -290,8 +290,8 @@ class Review(models.Model):
     date_added = models.DateTimeField(default=timezone.now)
     album = models.ForeignKey(Album, on_delete=models.SET_NULL, null=True)
     review = models.TextField(default='')
-    riyl = models.TextField('RIYL', blank=True, null=True)
     nfap = models.CharField('NFAP', max_length=255, null=True, blank=False)
+    riyl = models.TextField('RIYL', blank=True, null=True)
     instrumental = models.TextField('instrumental', help_text='instrumental tracks (no lyrics)', blank=True, null=True)
     recommended = models.TextField('rec tracks', help_text='recommended tracks', blank=True, null=True)
     olddb_id = models.IntegerField(null=True, blank=True)

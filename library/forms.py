@@ -180,6 +180,11 @@ class ReviewForm(LibraryCreateFormMixin, forms.ModelForm):
     class Meta:
         model = Review
         fields = '__all__'
+        widgets = {
+            'riyl': forms.Textarea(attrs={'rows': 3}),
+            'instrumental': forms.Textarea(attrs={'rows': 3}),
+            'recommended': forms.Textarea(attrs={'rows': 3}),
+        }
 
     '''
     Exec can change the user for someone's review
