@@ -26,7 +26,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-lhprnbuz!kyd48edt$yp%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG_VALUE', 'True') == 'True'
 
-ALLOWED_HOSTS = ['reviews.wrct.org', 'db.wrct.org', 'wrct.org', '127.0.0.1']
+ALLOWED_HOSTS = ['reviews.wrct.org', 'db.wrct.org', 'wrct.org', '127.0.0.1', '0.0.0.0']
 
 CSRF_TRUSTED_ORIGINS = ['https://' + host for host in ALLOWED_HOSTS]
 
