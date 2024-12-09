@@ -20,13 +20,14 @@ A website to host albums/reviews
         ports:
           - "8001:8001"
     ```
-1. Build docker container from Dockerfile
+1. You might need to comment out the var `AUTHENTICATION_BACKENDS` in settings.py. I don't remember, so if you find out it is or isn't necessary, please update this README 😅
+1. Build the docker container from the Dockerfile
     ```
     docker build .
     ```
 1. Launch docker container. If you want it to live in the background instead of sitting in your terminal, add `-d` to the end.
     ```
-    docker compose up
+    docker compose up --watch
     ```
 1. Open a shell inside the docker container
     ```
@@ -40,6 +41,13 @@ A website to host albums/reviews
 
 1. Add some albums if you need test data. *TODO:* Add some test data to this repo or add an easy way to copy data from the real database to local developemnt.
 
+1. When you're done, shut down the docker container by pressing ctrl+C in the shell that it's running in, or by running this:
+    ```
+    docker compose down
+    ```
+
+Next time, just run `docker compose up` to get going again.
+
 ## Credits
 
-CASSIDY
+🤩 CASSIDY 🤩
