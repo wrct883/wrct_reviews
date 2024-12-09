@@ -45,7 +45,6 @@
 {% endblock %}
 
 {% block scripts %}
-<script type="text/javascript" src="{% static 'js/list.js' %}"></script>
 {% if user.canBulkModify %}
 <script>
   const totalCount = {{ tables.list.count }};
