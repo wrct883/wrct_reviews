@@ -50,4 +50,4 @@ Next time, just run `docker compose up` to get going again.
 
 ## Credits
 
-🤩 CASSIDY 🤩
+First developed in Summer 2024 by WRCT eng staph and then maintained since
