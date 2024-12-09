@@ -16,7 +16,8 @@
   <tr>
     {% for field in fields %}
     <td>
-      {% if truncateRows %}{{ object|lookup:field|truncatechars_html:64 }}{% else %}{{ object|lookup:field }}{% endif %}
+      {% formatted_attribute object field as attribute %}
+      {% if truncateRows %}{{ attribute|truncatechars_html:64 }}{% else %}{{ attribute }}{% endif %}
       {% if field == 'review' %}
       <a href="{% url 'library:detail' 'review' object.id %}">(view)</a>
       {% endif %}

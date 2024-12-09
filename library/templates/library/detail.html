@@ -9,7 +9,7 @@
   <a href='{% url "library:list" object.table %}'>&#8592; back to {{ table }}s</a>
   <div class="grid mt1-5">
     {% for field in fields %}
-    <p class='subtitle'><b>{{ object|verbose_name:field }}: </b><span>{{ object|lookup:field }}</span></p>
+    <p class='subtitle'><b>{{ object|verbose_name:field }}: </b><span>{% formatted_attribute object field %}</span></p>
     {% endfor %}
   </div>
 
