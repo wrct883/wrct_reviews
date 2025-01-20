@@ -321,7 +321,11 @@ Asser that all albums in `albums` have the same value for these fields
 '''
 def get_shared_fields(albums):
     values = albums.values()
-    shared_values = values[0]
+    try:
+        shared_values = values[0]
+    except Exception as e:
+        messages.error(request, f"error (send this to ism!): {e}. values array is {values}")
+        return
     distinct_keys = set()
     for v in values:
         for key, value in v.items():
