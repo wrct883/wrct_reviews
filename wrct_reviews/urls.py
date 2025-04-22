@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 from django.contrib.admin import AdminSite
+from django.views.generic import TemplateView
 
 class LibraryAdminSite(AdminSite):
     def has_permission(self, request):
@@ -30,4 +31,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include("django.contrib.auth.urls")),
     path('', include("library.urls")),
+    path('underwriting', TemplateView.as_view(template_name='underwriting.html'), name='underwriting'),
 ]

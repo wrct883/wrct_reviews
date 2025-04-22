@@ -1,0 +1,45 @@
+<!-- UNDERWRITING SCRIPT created 2/22/18 by Martha Cryan (mcryan@wrct.org)
+Very rough first try at digitizing underwriting. Hopefully will add
+interface for people to edit / add scripts, but for now you can manually
+add them to the list in this file. -->
+
+<!DOCTYPE html>
+<html>
+<head>
+   <meta charset="UTF-8">
+   <title>Online Underwriting Scripts</title>
+   <link rel="stylesheet" type="text/css" href="static/css/underwriting.css" />
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+   <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;" />
+</head>
+<body>
+  <br></br>
+  <h1 class="mx-auto" style="width: 300px"> UNDERWRITING </h1>
+  <br></br>
+  <h3 id="para" class="mx-auto" style="width:1000px"> </h3>
+  <script>
+    var suffix = "<br></br> <b>**ALSO READ THE FOLLOWING:</b> If you are interested in underwriting for WRCT, you can email pr@wrct.org for more information about promotional exchanges and other partnership opportunities.";
+    var underwritingList = [
+"WRCT is supported by Row House Cinema. Row House Cinema is a single screen theater in the historic Lawrenceville neighborhood of Pittsburgh. Each week they choose a new movie theme ranging from classic, cult, foreign, animation, fantasy, and more. Their concessions feature natural popcorn with real butter, craft beer in the adjoining bottle shop, and vegan options. Row House Cinema is located at 4115 Butler Street in Lawrenceville. For more information, visit their website at RowHouseCinema DOT com or call (412) 904 - 3225. <br></br> <b>PRO US18-01 <br> :30</b>",
+
+ "WRCT is supported by Tartan Ink. Tartan Ink is a full service copy and print shop located in University Cohon Center on the Carnegie Mellon University Campus. Services provided by the Copy Center include: black and white and color copies, single and double-sided copying, and an assortment of colored and textured papers, including cover stock, specialty papers such as gloss paper, resume quality paper, and large format poster paper. They also offer binding and finishing options that include cutting, lamination, folding, padding, stapling, collating, and comb, thermal, and coil binding. Tartan Ink is also an authorized ship and drop off site for UPS shipping. For more information, visit their website at cmu DOT edu SLASH TartanInk, or call (412) 268 - 4828. <br></br> <b>0:45 PRO US18-02 <br>",
+
+"WRCT is supported by Spak Brothers Pizza, located at 5107 Penn Avenue in Bloomfield. Spak Brothers Pizza offers pizza, hoagies, and wings, and salads while specializing in vegan and vegetarian alternatives. Spak Brothers Pizza uses no refined sugars in its sauce and unbleached flour in its dough. Spak Brothers offers both takeout and delivery. For more information, email them at SpakHelp AT gmail DOT com or visit their website at Spak Brothers DOT com. <br></br> <b> :30 PRO-US13-02 </b>",
+
+
+"WRCT is supported by Sidecar Bakery in North Oakland. Sidecar is an independent coffee shop with a full coffee bar, ready-made breakfast sandwiches, breakfast pastries, savory hand pies, cakes, and pies made in the bakery next door. Sidecar offers a place to study, eat, and hang with friends in a cafe setting. Open 7am to 7pm Monday through Saturday, and 9am to 3pm on Sunday. For more information, visit their websit at sidecar 412 DOT com. <br><br><b>SB23-S01 <br>:30</b>",
+
+"WRCT is supported by Rita’s Italian Ice. Rita's offers a variety of frozen treats including their Italian Ice, made fresh daily with real fruit, available in over 95 flavors. Rita's has several locations throughout the city of Pittsburgh, including a stand at 3712 Fifth Ave near the University of Pittsburgh campus. For more information, visit their website at RitasIce DOT com. <br><br><b>RII21-F01 <br>:30<b>",
+
+"WRCT is supported by Attic Records, located in Millvale. Attic Records is open seven days a week. They sell new and used records and CD's from a range of genres including rock, doo-wop, metal, reggae, and hip-hop. Attic Records is an independently owned and operated shop that purchases used records and CD's from collectors in bulk or by unit. Attic Records is located at 513 Grant Avenue in Millvale. More information about selling records and new releases is available at (412) 821 - 8484 or at AtticRecordStoreInc DOT com.<br></br> <b> :30 ARU20-F01 <br> :30<b>",
+
+"WRCT is supported by ReMasterMedia. ReMasterMedia is an online tool that can reprocess and optimize audio sound for internet and broadcast settings for both professional and personal use. They offer tools that can add depth, clarity and stereo imaging to audio and video, as well as noise reduction features to eliminate buzz and hiss from remote or phone recordings. More information on how to reprocess audio or video is available at ReMasterMedia DOT com. <br></br> <b> :30 RMMU20-F01 <br> :30<b>"
+
+  ];
+    var underwritingScript = underwritingList[Math.floor(Math.random()*underwritingList.length)] + " " + suffix;
+    document.getElementById('para').innerHTML = underwritingScript;
+  </script>
+  <!-- "Spak Brother Pizza joins you in supporting WRCT Pittsburgh. <br></br> Spak Brothers Pizza offers pizza, hoagies, and wings while specializing in vegan and vegetarian alternatives. <br></br> Spak Brothers Pizza uses no refined sugars in its sauce and unbleached flour in its dough. <br></br> Spak Brothers Pizza is located at 51-oh-7 Penn Avenue in the Garfield neighborhood of Pittsburgh. <br></br> For more information, call (412) 362-SPAK (7725) or visit their website at spak brothers dot com.<br></br> <b> PRO US13-02 <br> :30 </b>",
+    -->
+</body>
+</html>
