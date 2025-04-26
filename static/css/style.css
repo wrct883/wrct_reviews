@@ -1,14 +1,4 @@
 :root {
-  --pink: #ff0091;
-  --light-pink: #f78da7;
-  --orange: #f9b147;
-  --light-orange: #fcc737;
-  --light-gray: #eee;
-  --gray: #ccc;
-  --success: #53ca53;
-  --error: #b91d1d;
-  --info: cornflowerblue;
-
   --main-width: 55rem;
   --main-big-width: 70rem;
   --side-panel-width: 20rem;
@@ -25,9 +15,10 @@ html, body {
 
 body {
   font-family: BlinkMacSystemFont, -apple-system, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: #111;
+  color: var(--neutral-darker);
   line-height: 1.25;
   font-size: 1.1em;
+  background-color: var(--bg-main);
 }
 
 .hidden {
@@ -47,7 +38,7 @@ body {
   margin-bottom: 1rem;
   position: relative;
   max-width: 400px;
-  color: var(--light-gray);
+  color: var(--neutral-light);
 }
 .messages li .close {
   position: absolute;
@@ -56,9 +47,9 @@ body {
   padding: 0.25rem 0.5rem;
   cursor: pointer;
 }
-.messages li.is-error { background: var(--error); }
-.messages li.is-success { background: var(--success); }
-.messages li.is-info { background: var(--info); }
+.messages li.is-error { background: var(--status-error); }
+.messages li.is-success { background: var(--status-success); color: var(--status-text) }
+.messages li.is-info { background: var(--status-info); }
 
 main {
   max-width: var(--main-width);
@@ -66,28 +57,28 @@ main {
   margin-top: 2rem;
   padding: 0 2em 2em 2em;
   box-sizing: content-box;
-  /*border-left: 2px dotted var(--gray);
-  border-right: 2px dotted var(--gray);*/
+  /*border-left: 2px dotted var(--neutral-medium);
+  border-right: 2px dotted var(--neutral-medium);*/
   /*overflow: auto;*/
 }
 main.big { max-width: var(--main-big-width); }
 
 a {
-  color: var(--pink);
+  color: var(--accent-primary);
   text-decoration: none;
   transition: 0.2s;
 }
 a:hover {
-  color: var(--light-pink);
+  color: var(--accent-primary-light);
   text-decoration: underline;
 }
 a.active { font-weight: bold; }
 
 nav {
-  border-bottom: 1px solid var(--gray);
+  border-bottom: 1px solid var(--neutral-medium);
   align-items: center;
   padding: 0.7em 2em;
-  background: white;
+  background: var(--bg-main);
 }
 nav ul {
   margin: 0;
@@ -109,21 +100,22 @@ nav li:last-of-type {
 
 input, select, textarea {
   padding: 5px 7.5px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-medium);
+  color: var(--text)
   border-radius: 2px;
   max-width: 100%;
+  background-color: var(--bg-main);
 }
 input:focus, select:focus {
-  border-color: var(--pink);
+  border-color: var(--accent-primary);
 }
-
 
 button, input[type=button], input[type=submit] {
   padding: 0.5em 1em;
   margin: 0;
   border: 0;
   border-radius: 4px;
-  background-color: var(--pink);
+  background-color: var(--accent-primary);
   color: white;
   font-size: 1rem;
   cursor: pointer;
@@ -137,26 +129,26 @@ button.small {
   padding: 0.25em;
 }
 button:hover, button.outline:hover, input[type=button]:hover, input[type=submit]:hover {
-  background-color: var(--light-pink);
+  background-color: var(--accent-primary-light);
 }
 button.outline {
-  background-color: white;
-  border: 1px solid var(--pink);
-  color: var(--pink);
+  background-color: var(--bg-main);
+  border: 1px solid var(--accent-primary);
+  color: var(--accent-primary);
 }
-button.outline:hover { color: white; border-color: var(--light-pink); }
+button.outline:hover { color: white; border-color: var(--accent-primary-light); }
 button.outline.delete {
-  background-color: white;
-  border: 1px solid var(--error);
-  color: var(--error);
+  background-color: var(--bg-main);
+  border: 1px solid var(--status-error);
+  color: var(--status-error);
 }
-button.outline.delete:hover { color: white; background-color: var(--error); }
+button.outline.delete:hover { color: white; background-color: var(--status-error); }
 button.gray {
-  background-color: var(--light-gray);
-  border: 1px solid #aaa;
-  color: #333;
+  background-color: var(--neutral-light);
+  border: 1px solid var(--neutral-dark);
+  color: var(--neutral-darker);
 }
-button.gray:hover { background-color: var(--gray); }
+button.gray:hover { background-color: var(--neutral-medium); }
 button .icon {
   font-size: 1.3em;
   margin-left: 0.25em;
@@ -165,7 +157,7 @@ button .icon.left { margin-left: revert; margin-right: 0.25em; }
 button:disabled {
   cursor: not-allowed;
   opacity: 0.6;
-  border:1px solid var(--error);
+  border:1px solid var(--status-error);
 }
 
 .header-h1 {
@@ -181,13 +173,13 @@ button:disabled {
   align-items: baseline;
 }
 .header aside, .edit-links {
-  background-color: var(--light-gray);
+  background-color: var(--bg-highlight);
   border-radius: 4px;
   padding: 0 1em 1em 1em;
-  border: 1px solid var(--light-gray);
+  border: 1px solid var(--neutral-light);
 }
 .header > div {
-  border: 1px solid var(--gray);
+  border: 1px solid var(--neutral-medium);
   border-radius: 4px;
   padding: 0 1em;
 }
@@ -216,14 +208,14 @@ table {
   margin-bottom: 1em;
 }
 td, th { padding: 0.5em; text-align: left; }
-.list-table td, .list-table th { border: 1px solid #ddd; }
+.list-table td, .list-table th { border: 1px solid var(--border-light); }
 .list-table td { font-family: monospace; font-size: 1rem;}
 .list-table tr:nth-child(even) {
-  background-color: #dddddd;
+  background-color: var(--bg-alt);
 }
 .step-links a, .step-links .current { margin-right: 0.25em; }
 .pointer { cursor: pointer; transition: 0.2s; }
-th.pointer:hover { background-color: #eee !important; }
+th.pointer:hover { background-color: var(--neutral-light) !important; }
 td.pointer:hover { background-color: rgba(0,0,0,0.2) !important; }
 .scrollable {
   display: block;
@@ -283,7 +275,7 @@ label:has(~ textarea) {
 }
 .search-input::before {
   content: "🔍";
-  background: #ccc;
+  background: var(--neutral-medium);
   position: absolute;
   height: calc(100% - 2px);
   top: 1px;
@@ -307,21 +299,21 @@ label:has(~ textarea) {
   border-bottom: 1px solid;
   border-left: 1px solid;
   border-right: 1px solid;
-  border-color: #ccc;
-  background: #f8f8f8;
+  border-color: var(--border-medium);
+  background: var(--bg-alt);
   padding: 0.5rem 0.75rem;
   cursor: pointer;
   transition: 0.2s;
 }
 .search-result:last-of-type {
-  border-bottom: 3px solid #ccc;
+  border-bottom: 3px solid var(--border-medium);
 }
 .search-result:hover {
-  background: #fff;
+  background: var(--bg-main);
 }
 .search-result .subtitle {
   font-size: 0.8em;
-  color: #333;
+  color: var(--neutral-darker);
   font-family: mono, monospace;
   margin: 0.25rem 0 0 0;
 }
@@ -354,7 +346,7 @@ main.detail {
 }
 .list-links span:not(:last-of-type)::after {
   content: "⦁︎";
-  color: #111;
+  color: var(--neutral-darker);
   margin: 0 0.25rem;
 }
 
@@ -381,8 +373,8 @@ main.detail {
 .leaderboard .leaderboard-count {display: none;}
 .leaderboard .leaderboard-user {}
 .leaderboard li:first-of-type {
-  background: var(--pink);
-  color: var(--light-gray);
+  background: var(--accent-primary);
+  color: var(--neutral-light);
   box-shadow: rgba(149, 157, 165, 0.2) 4px 8px 8px;
   font-size: 1.3em;
 }
@@ -395,7 +387,7 @@ details[open=""] > summary {
   margin-bottom: 1rem;
 }
 details[open=""] {
-  background: var(--light-gray);
+  background: var(--bg-highlight);
   padding: 1rem;
 }
 
@@ -403,7 +395,7 @@ details[open=""] {
   position: fixed;
   bottom: 0;
   left: 0; right: 0;
-  background-color: var(--pink);
+  background-color: var(--accent-primary);
   color: white;
   text-align: center;
   display: block;
@@ -412,7 +404,7 @@ details[open=""] {
   cursor: pointer;
 }
 .bulk-modify-submit:hover {
-  background: var(--light-pink);
+  background: var(--accent-primary-light);
 }
 .repeat-cols {
   display: grid;

@@ -1,0 +1,23 @@
+:root {
+  --accent-primary: #8ec07c;
+  --accent-primary-light: #689d6a;
+  --accent-secondary: #b8bb26;
+  --accent-secondary-light: #fabd2f;
+
+  --bg-main: #282828;
+  --bg-alt: #3c3836;
+  --bg-highlight: #504945;
+
+  --neutral-light: #a89984;
+  --neutral-medium: #928374;
+  --neutral-dark: #7c6f64;
+  --neutral-darker: #ebdbb2;
+
+  --status-success: #d3869b;
+  --status-text: #ebdbb2;
+  --status-error: #fb4934;
+  --status-info: #83a598;
+
+  --border-light: #504945;
+  --border-medium: #665c54;
+}
