@@ -70,6 +70,14 @@ class User(AbstractUser):
 
     auth_level = models.CharField(max_length=5, choices=AUTHLEVEL_CHOICES, default='user')
 
+    THEME_CHOICES = [
+        ("auto", "Auto"),
+        ("dark", "Dark"),
+        ("light", "Light"),
+    ]
+
+    theme = models.CharField(max_length=5, choices=THEME_CHOICES, default='auto')
+
     olddb_id = models.IntegerField(null=True, blank=True)
 
     @property

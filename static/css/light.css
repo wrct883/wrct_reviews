@@ -1,0 +1,23 @@
+:root {
+  --accent-primary: #ff0091;
+  --accent-primary-light: #f78da7;
+  --accent-secondary: #f9b147;
+  --accent-secondary-light: #fcc737;
+
+  --bg-main: #ffffff;
+  --bg-alt: #ddd;
+  --bg-highlight: #eee;
+
+  --neutral-light: #eee;
+  --neutral-medium: #ccc;
+  --neutral-dark: #aaa;
+  --neutral-darker: #111;
+
+  --status-success: #53ca53;
+  --status-text: #fff;
+  --status-error: #b91d1d;
+  --status-info: cornflowerblue;
+
+  --border-light: #ddd;
+  --border-medium: #ccc;
+}
