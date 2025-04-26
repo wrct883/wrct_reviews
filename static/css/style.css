@@ -374,7 +374,7 @@ main.detail {
 .leaderboard .leaderboard-user {}
 .leaderboard li:first-of-type {
   background: var(--accent-primary);
-  color: var(--neutral-light);
+  color: var(--neutral-darker);
   box-shadow: rgba(149, 157, 165, 0.2) 4px 8px 8px;
   font-size: 1.3em;
 }
