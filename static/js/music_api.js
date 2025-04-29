@@ -1,11 +1,9 @@
-const API_SECRET = "8c96e05d82dcc8bd73ad54b96dd26c25";
-const parentEl = document.querySelector('#api-info');
-
 let xhr = new XMLHttpRequest();
 xhr.timeout = 5 * 1000; // 5 seconds
 xhr.responseType = 'json';
 
 function getUrl(method, params){
+  const API_SECRET = "8c96e05d82dcc8bd73ad54b96dd26c25";
   var root = "https://ws.audioscrobbler.com/2.0/";
   var allParams = {
     "method": method,
@@ -39,6 +37,7 @@ function getAlbum(response){
   var section = document.createElement("section");
   section.innerHTML = `${imageHTML}
   ${tracksHTML}`;
+  const parentEl = document.querySelector('#api-info');
   parentEl.appendChild(section);
 }
 

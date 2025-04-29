@@ -9,7 +9,7 @@ CREATE USER IF NOT EXISTS wrct@localhost
 GRANT ALL ON wrct.* TO wrct@localhost WITH GRANT OPTION;
 
 CREATE USER IF NOT EXISTS www@'%'
-  IDENTIFIED WITH mysql_native_password BY 'fuckyou';
+  IDENTIFIED WITH mysql_native_password BY 'password';
 GRANT CREATE, DELETE, INSERT, SELECT, UPDATE ON wrct.* TO www@'%';
 
 -- SECTION 1: Library and Bin
