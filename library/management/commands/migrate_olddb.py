@@ -14,11 +14,13 @@ from datetime import datetime
 import pytz
 from library.models import *
 
+import os
+
 db = mysql.connector.connect(
   host="olddb.wrct.org",
   port=4306,
   user="www",
-  password="fuckyou", # it's a private code repo, but this is a password, lol
+  password=os.getenv('DB_ROOT_PASSWORD', 'password'),
   database="wrct",
 )
 
