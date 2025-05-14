@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, render
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, HttpResponseBadRequest, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseServerError
 from django.urls import reverse
 from django.views import generic
 from .models import (
@@ -481,6 +481,8 @@ def music_api_helper(table, payload):
     API_SECRET = os.getenv('LASTFM_API_KEY')
     if not API_SECRET:
         return HttpResponseServerError('Server misconfiguration: API key missing')
+    else:
+        API_SECRET = API_SECRET.replace('"', "")
     base_url = "https://ws.audioscrobbler.com/2.0/"
     params = {
         'method': table + '.getinfo',
