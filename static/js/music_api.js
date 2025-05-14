@@ -2,31 +2,16 @@ let xhr = new XMLHttpRequest();
 xhr.timeout = 5 * 1000; // 5 seconds
 xhr.responseType = 'json';
 
-function getUrl(method, params){
-  const API_SECRET = "8c96e05d82dcc8bd73ad54b96dd26c25";
-  var root = "https://ws.audioscrobbler.com/2.0/";
-  var allParams = {
-    "method": method,
-    "api_key": API_SECRET,
-    ...params,
-    "format": "json",
-  }
-  return root +  "?" + new URLSearchParams(allParams).toString();
-}
-
 function getAlbum(response){
-  var a = response.album;
 
   var tracksHTML = ""; var imageHTML = "";
 
-  if (a.hasOwnProperty('image')) {
-    var image = a.image[Math.min(a.image.length, 3)]["#text"];
-    if (image)
-      imageHTML = `<img src="${image}"/>`;
+  if (response.hasOwnProperty('image')) {
+    imageHTML = `<img src="${response.image}"/>`;
   }
 
-  if (a.hasOwnProperty('tracks')) {
-    var tracks = a.tracks.track;
+  if (response.hasOwnProperty('tracks')) {
+    var tracks = response.tracks;
     tracksHTML = `<div class='no-contents'><h2>Tracks</h2><ol>`;
     tracks.forEach((track) => {
       tracksHTML += `<li>${track.name}</li>`
@@ -45,9 +30,18 @@ function getArtist(response){
 }
 
 function getApi() {
-  var url = getUrl(`${table.toLowerCase()}.getinfo`, {"album": album, "artist": artist});
-  xhr.open('GET', url);
-  xhr.send();
+  const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+  xhr.open('POST', '/api/music', true);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.setRequestHeader('X-CSRFToken', csrfToken);
+
+  var data = {
+    album: album,
+    artist: artist,
+    table: table,
+  };
+
   xhr.onload = function() {
     if (xhr.status != 200) { // analyze HTTP status of the response
       console.log('error', xhr.status, xhr.statusText);
@@ -58,5 +52,8 @@ function getApi() {
         getArtist(xhr.response);
     }
   };
+
+  xhr.send(JSON.stringify(data));
 }
 getApi();
+
