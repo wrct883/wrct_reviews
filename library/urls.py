@@ -24,4 +24,6 @@ urlpatterns = [
 
     path("actions", views.ActionListView.as_view(), name="actions"),
     path("leaderboard", views.leaderboard, name="leaderboard"),
+
+    path("api/music", views.music_api, name="music_api"),
 ]

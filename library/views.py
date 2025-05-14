@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, render
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.urls import reverse
 from django.views import generic
 from .models import (
@@ -13,6 +13,7 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 
 from django.contrib import messages
 from django.apps import apps
@@ -30,6 +31,10 @@ from .forms import (
     BulkModifyListForm,
 )
 from urllib.parse import urlencode
+
+import requests
+import json
+import os
 
 PAGINATION_COUNT = 25
 ORDERING_SUFFIX = "_o"
@@ -466,3 +471,88 @@ def leaderboard(request):
     }
     return render(request, 'library/leaderboard.html', context)
 
+def music_api_helper(table, payload):
+    '''
+    returns the json response that server should respond with, or an error
+    see next fn for specs
+    '''
+    # TODO: change this to music brainz
+    # make an api request to lastfm
+    API_SECRET = os.getenv('LASTFM_API_KEY')
+    if not API_SECRET:
+        return HttpResponseServerError('Server misconfiguration: API key missing')
+    base_url = "https://ws.audioscrobbler.com/2.0/"
+    params = {
+        'method': table + '.getinfo',
+        'api_key': API_SECRET,
+        'artist': payload['artist'],
+        'format': 'json',
+    }
+    if table == 'album':
+        params['album'] = payload['album']
+
+    '''
+    TODO: with an album, optionally use these fields to get a more precise answer
+    year = payload.get('year')
+    label = payload.get('label')
+    fmt = payload.get('format')
+    '''
+
+    try:
+        api_response = requests.get(base_url, params=params, timeout=5)
+    except requests.Timeout:
+        return JsonResponse({'error': 'External API timeout'}, status=504)
+
+    if api_response.status_code != 200:
+        print(api_response.content, params)
+        return JsonResponse({'error': 'External API error', 'status': api_response.status_code}, status=502)
+    # return an error
+
+    api_data = api_response.json()
+
+    # Build response payload
+    description_field = 'wiki' if table == 'album' else 'bio'
+    result = {
+        'tracks': api_data.get('album', {}).get('tracks', {}).get('track', []),
+        'description': api_data.get(table, {}).get(description_field, {}).get('summary', '')
+    }
+    images = api_data.get(table, {}).get('image', [])
+    if images:
+        result['image'] = images[min(len(images), 3)].get("#text")
+
+    return JsonResponse(result)
+
+
+@require_POST
+def music_api(request):
+    '''
+    user sends this POST data:
+    * table - what they want (album or artist)
+    * album - the album name, if present
+    * artist - the artist name, always required
+
+    if table is "album", server responds with
+    * image - text; url to album art
+    * tracks - list of tracks in the format
+        [{"name": track 1}, {"name": track 2}, etc]
+    ^ more fields can be added as desired
+
+    if table is "artist", server responds with
+    * description - text; artist bio
+    * image - text; url to artist image
+    ^ more fields can be added as desired
+
+    fields should be "None" if no data of that kind found
+    '''
+    # get/validate the user data
+    try:
+        payload = json.loads(request.body)
+        table = payload['table'].lower()
+        album = None
+        if table == 'album':
+            album = payload['album']
+        artist = payload['artist']
+    except Exception as e:
+        return HttpResponseBadRequest('Invalid request', e)
+
+    return music_api_helper(table, payload)
