@@ -1,6 +1,10 @@
 # WRCT Reviews
 
 A website to host albums/reviews
+![home screen](_imgs/home_screen_light.webp)
+![review](_imgs/review_light.webp)
+![leaderboard](_imgs/leaderboard_light.webp)
+![dark home screen](_imgs/home_screen_dark.webp)
 
 ## Getting started with local development
 1. Create a python virtual environment
