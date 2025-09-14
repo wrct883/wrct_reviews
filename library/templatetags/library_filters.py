@@ -63,6 +63,8 @@ def formatted_attribute(context, obj, field):
             regex = re.compile(r"^(?:<.+?>)?(" + re.escape(escaped_query) + ")", re.IGNORECASE)
         elif pos == 'iendswith':
             regex = re.compile(r"(" + re.escape(escaped_query) + ")(?:<.+?>)?$", re.IGNORECASE)
+        elif pos == 'iexact':
+            regex = re.compile(r"^(?:<.+?>)?(" + re.escape(escaped_query) + ")(?:<.+?>)?$", re.IGNORECASE)
         string_rep = regex.sub(r'<b>\g<0></b>', string_rep)
 
     # Linkify if applicable
