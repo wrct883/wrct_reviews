@@ -1,8 +1,7 @@
-version: '3.7'
 services:
   reviews-db:
     image: mysql:9
-    container_name: wrct-reviews-mariadb
+    container_name: wrct-reviews-mysql
     restart: always
     volumes:
       - ./data:/var/lib/mysql
