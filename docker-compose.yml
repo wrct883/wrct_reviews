@@ -8,23 +8,28 @@ services:
       - ./data:/var/lib/mysql
     env_file:
       - ./.env
+    healthcheck:                        # Added healthcheck
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 5
 
   reviews-backend:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: wrct-reviews-backend
-    command: sh -c "python3 manage.py migrate --noinput && python3 manage.py collectstatic --noinput && python manage.py runserver 0.0.0.0:8001"
+    command: sh -c "python3 manage.py migrate --noinput && python3 manage.py collectstatic --noinput && python3 manage.py runserver 0.0.0.0:8001"
     restart: always
     volumes:
       - .:/app
     env_file:
       - ./.env
     depends_on:
-      - reviews-db
+      reviews-db:
+        condition: service_healthy
     ports:
       - "8001:8001"
 networks:
   default:
-      name: wrct-dockernet
+      name: dockernet
       external: true
